@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/*
+ * Variante dark: pour ce qui n'est pas une couleur (les couleurs passent par les tokens).
+ * Le thème sombre suit la préférence système ; une classe .dark ou .light sur <html> la force.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────────── 1. Palette : nom → hexadécimal (seul endroit où un hexadécimal apparaît) ───────────── */
+/* Couleurs extraites de la maquette orion.html. */
+@theme {
+  --color-neutral-950: #121212; /* encre : texte, bordures, ombres (le #000 de la maquette y est fusionné) */
+  --color-white: #FFFFFF;       /* papier */
+  --color-lime-300: #D4F53C;    /* surlignage : survol des liens, message de confirmation */
+  --color-cyan-400: #3FD8FF;    /* focus des champs, illustration */
+  --color-pink-500: #FF3AA0;    /* accent : bouton actif, ombre du titre, illustration */
+  --color-orange-500: #FF6A1A;  /* illustration */
+}
+
+/* ───────────── 2. Tokens sémantiques (les seuls à utiliser dans les composants) ───────────── */
+/* "inline" : les utilitaires lisent les variables du thème actif. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-focus: var(--focus);
+
+  --color-illustration-1: var(--illustration-1);
+  --color-illustration-2: var(--illustration-2);
+  --color-illustration-3: var(--illustration-3);
+
+  /* Ombres pleines décalées, signature visuelle de la maquette : shadow-hard-sm / shadow-hard / shadow-hard-lg */
+  --shadow-hard-sm: 3px 3px 0 var(--border);
+  --shadow-hard: 6px 6px 0 var(--border);
+  --shadow-hard-lg: 8px 8px 0 var(--border);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ───────────── 3. Thèmes ───────────── */
+/*
+ * Contraste (WCAG) : les couleurs vives (lime, cyan, rose, orange) sont illisibles sous du texte blanc
+ * (1,2 à 3,3:1). Leur texte est donc toujours l'encre, dans les deux thèmes (*-foreground).
+ */
+:root {
+  --background: var(--color-white);
+  --foreground: var(--color-neutral-950);
+  --border: var(--color-neutral-950);
+
+  --accent: var(--color-pink-500);
+  --accent-foreground: var(--color-neutral-950);
+  --highlight: var(--color-lime-300);
+  --highlight-foreground: var(--color-neutral-950);
+  --focus: var(--color-cyan-400);
+
+  --illustration-1: var(--color-cyan-400);
+  --illustration-2: var(--color-pink-500);
+  --illustration-3: var(--color-orange-500);
+}
+
+/* Sombre : inversion encre / papier, les couleurs vives restent identiques. */
+.dark {
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-white);
+  --border: var(--color-white);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: var(--color-neutral-950);
+    --foreground: var(--color-white);
+    --border: var(--color-white);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
