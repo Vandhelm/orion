@@ -77,6 +77,20 @@ Tailwind v4 (config dans le CSS) :
 
 Dans les composants on écrit `bg-accent`, `text-foreground`, `bg-background`.
 
+### Si la palette n'existe pas encore : l'extraire de l'existant
+
+Ne pas inventer de couleurs. La palette se reconstruit à partir de ce qui est déjà dans le code :
+
+1. **Inventaire** : relever toutes les couleurs utilisées (`Grep` sur `#[0-9a-fA-F]{3,8}`, `rgb(`, `hsl(`, `oklch(`, `[#` pour les valeurs arbitraires Tailwind, et les classes de palette Tailwind comme `bg-zinc-50`). Chercher dans le CSS global, les CSS Modules, les composants, les SVG, et les maquettes HTML présentes dans le dépôt. Pour chaque couleur, noter où et comment elle est utilisée (fond, texte, bordure, focus, survol, illustration...).
+2. **Source de vérité** : si une maquette ou un design dédié existe (fichier HTML, Figma), il prime sur le code de démarrage d'un générateur (create-next-app, etc.), qui sera remplacé.
+3. **Fusionner les quasi-doublons** (couleurs presque identiques, comme `#000` et `#121212` utilisés pour le même rôle) et le signaler.
+4. **Nommer la palette** par teinte et intensité, à la manière de Tailwind (`pink-500`, `lime-300`, `neutral-950`), en choisissant l'intensité la plus proche de l'échelle Tailwind.
+5. **Déduire les tokens** des rôles observés à l'étape 1 (`background`, `foreground`, `border`, `accent`, `highlight`, `focus`...). Un token par rôle, pas par couleur.
+6. **Construire le thème sombre** : si l'existant n'en a pas, inverser les neutres (fond ↔ texte, bordures) et garder les couleurs vives, sauf si elles posent un problème de contraste.
+7. **Vérifier le contraste** de chaque paire texte/fond dans les deux thèmes (WCAG AA : 4,5:1 pour le texte). Une couleur vive illisible sous du blanc reçoit un token `*-foreground` fixe et sombre dans les deux thèmes.
+8. **Écrire** la palette, les tokens et les thèmes dans le CSS global, avec un commentaire court sur le rôle de chaque couleur. Garder le comportement actuel du thème (par exemple, suivre la préférence système si c'était le cas).
+9. **Ne pas remplacer en masse** les couleurs codées en dur dans les composants pendant cette étape. Présenter le tableau palette → tokens à la personne, puis migrer les composants ensuite, fichier par fichier.
+
 Tailwind v3 : même principe. La palette va dans `theme.extend.colors` de `tailwind.config`, les tokens pointent vers des variables CSS (`accent: "var(--accent)"`), les variables sont définies dans `:root` / `.dark` du CSS global, et on règle `darkMode: "class"`.
 
 Règles :
