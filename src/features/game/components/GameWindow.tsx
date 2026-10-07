@@ -94,9 +94,9 @@ function useReplayReveal(element: RefObject<HTMLElement | null>, revealed: boole
   }, [replayKey, element, revealed]);
 }
 
-/** Fenêtre « Joue maintenant » : onglets Anonyme / Authentification, JOUER, salons, code. */
+/** Fenêtre « Joue maintenant » : onglets Anonyme / Authentification ; JOUER, salons et code en mode Anonyme seulement. */
 export function GameWindow() {
-  const { activeWindow, homeRevealed, busy, quickPlay, openCreateRoom, openRooms, homeWindowRef, playButtonRef, roomsButtonRef } =
+  const { mode, activeWindow, homeRevealed, busy, quickPlay, openCreateRoom, openRooms, homeWindowRef, playButtonRef, roomsButtonRef } =
     useGame();
   useReplayReveal(homeWindowRef, homeRevealed);
 
@@ -113,20 +113,23 @@ export function GameWindow() {
       <div className="wbody">
         <AnonPanel />
         <AuthPanel />
-        <div className="acts">
-          <button ref={playButtonRef} className="submit main" type="button" disabled={busy} onClick={quickPlay}>
-            JOUER
-          </button>
-          <button className="submit" type="button" onClick={() => openCreateRoom("home")}>
-            CRÉER UN SALON
-          </button>
-          <button ref={roomsButtonRef} className="submit" type="button" onClick={openRooms}>
-            SALONS
-          </button>
+        {/* Masqué plutôt que retiré en mode Authentification : le jeu garde ses références (focus, transitions). */}
+        <div className="contents" hidden={mode === "auth"}>
+          <div className="acts">
+            <button ref={playButtonRef} className="submit main" type="button" disabled={busy} onClick={quickPlay}>
+              JOUER
+            </button>
+            <button className="submit" type="button" onClick={() => openCreateRoom("home")}>
+              CRÉER UN SALON
+            </button>
+            <button ref={roomsButtonRef} className="submit" type="button" onClick={openRooms}>
+              SALONS
+            </button>
+          </div>
+          <hr className="sep" />
+          <JoinCodeForm />
+          <StatusMessage area="home" />
         </div>
-        <hr className="sep" />
-        <JoinCodeForm />
-        <StatusMessage area="home" />
       </div>
     </section>
   );

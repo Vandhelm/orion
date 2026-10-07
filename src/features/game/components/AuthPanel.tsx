@@ -83,15 +83,6 @@ export function AuthPanel() {
     emailRef.current?.focus();
   }
 
-  function forgotPassword() {
-    if (!EMAIL_PATTERN.test(email.trim())) {
-      say("auth", "Entre ton courriel ci-dessus : on t'enverra un lien pour changer ton mot de passe.", true);
-      emailRef.current?.focus();
-      return;
-    }
-    say("auth", "La réinitialisation par courriel n'est pas encore disponible.", true);
-  }
-
   return (
     <div className="panel" id="panelAuth" role="tabpanel" aria-labelledby="tabAuth" hidden={mode !== "auth"}>
       <form className="authf" noValidate onSubmit={signIn} hidden={!!account}>
@@ -133,9 +124,6 @@ export function AuthPanel() {
           SE CONNECTER
         </button>
         <div className="alinks">
-          <button className="linkbtn" type="button" onClick={forgotPassword}>
-            Mot de passe oublié ?
-          </button>
           <button className="linkbtn" type="button" onClick={signUp} disabled={pending}>
             Créer un compte
           </button>
