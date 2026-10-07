@@ -30,8 +30,8 @@ function Seats({ room, host }: SeatsProps) {
 
 /** Salle d'attente : code à partager, places, départ donné par l'hôte. */
 export function LobbyWindow() {
-  const { activeWindow, lobby, lobbyRoom, avatar, playerName, leaveLobby, startRace, copyLobbyCode, lobbyWindowRef } = useGame();
-  const room = lobbyRoom;
+  const { activeWindow, lobby, avatar, playerName, leaveLobby, startRace, copyLobbyCode, lobbyWindowRef } = useGame();
+  const room = lobby?.room;
   const host = !!lobby?.host;
   const tooFewPlayers = !room || room.players < MIN_PLAYERS_TO_START;
 
@@ -48,7 +48,7 @@ export function LobbyWindow() {
           </div>
           <div className="lcode">
             <span>CODE</span>
-            <b>{room?.code}</b>
+            <b>{room?.id}</b>
             <button className="mini" type="button" onClick={copyLobbyCode}>
               COPIER
             </button>
@@ -58,7 +58,7 @@ export function LobbyWindow() {
           <span style={{ fontSize: 20 }}>Places :</span>{" "}
           <span style={{ fontSize: 20 }}>{room && `${room.players} / ${room.maxPlayers} prises`}</span>
         </div>
-        {room && <Seats key={room.code} room={room} host={host} />}
+        {room && <Seats key={room.id} room={room} host={host} />}
         <p className="lnote">Les autres pilotes restent anonymes : seul le nombre de places prises est affiché.</p>
         <div className="me">
           <span className="meav">

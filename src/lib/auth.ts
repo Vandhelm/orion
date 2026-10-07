@@ -1,9 +1,9 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { username } from "better-auth/plugins";
-import { Pool } from "pg";
-// Chemin relatif : le CLI de migration ne connaît pas l'alias @/.
+// Chemins relatifs : le CLI de migration ne connaît pas l'alias @/.
 import { pseudoEmail } from "../features/auth/pseudo-email";
+import { pool } from "./db";
 
 // Pas de "server-only" ici : le CLI de Better Auth importe ce fichier pour les migrations.
 
@@ -23,7 +23,7 @@ function socialProviders(): BetterAuthOptions["socialProviders"] {
 }
 
 export const auth = betterAuth({
-  database: new Pool({ connectionString: process.env.DATABASE_URL }),
+  database: pool,
   emailAndPassword: {
     enabled: true,
     // Mots de passe hachés en scrypt (sel unique par utilisateur) par Better Auth.

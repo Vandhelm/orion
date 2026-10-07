@@ -112,11 +112,11 @@ function RoomDetail({ room, searching, onJoin }: { room: Room | undefined; searc
 /** Page Salons : salons publics ouverts en cases autour du détail de celui qui est choisi. */
 export function RoomsPage() {
   const game = useGame();
-  const { rooms, roomsOpen, roomsQuery, roomsPageIndex, selectedRoomCode, roomsPageRef, roomsGridRef } = game;
+  const { publicRooms, roomsOpen, roomsQuery, roomsPageIndex, selectedRoomId, roomsPageRef, roomsGridRef } = game;
 
-  const list = listOpenPublicRooms(rooms, roomsQuery);
+  const list = listOpenPublicRooms(publicRooms, roomsQuery);
   const { shown, page, pageCount, perPage } = paginateRooms(list, roomsPageIndex);
-  const selected = shown.find((room) => room.code === selectedRoomCode) ?? shown[0];
+  const selected = shown.find((room) => room.id === selectedRoomId) ?? shown[0];
   const cellCount = shown.length + (pageCount > 1 ? 1 : 0);
   const layout = layoutRoomGrid(cellCount);
   const nextPage = (page + 1) % pageCount;
@@ -133,13 +133,13 @@ export function RoomsPage() {
 
   /** Le pictogramme de la case glisse jusqu'au détail (View Transition), sinon simple fondu. */
   function select(room: Room, cell: HTMLButtonElement) {
-    if (room.code === selected?.code) return;
+    if (room.id === selected?.id) return;
     const detail = document.getElementById("rDetail");
     setTransitionName(detail?.querySelector(".rd-pic"));
     setTransitionName(cell.querySelector(".pic"), "roompic");
     const transition = withViewTransition(() => {
       setTransitionName(cell.querySelector(".pic"));
-      game.setSelectedRoomCode(room.code);
+      game.setSelectedRoomId(room.id);
       game.hush("rooms");
       setTransitionName(detail?.querySelector(".rd-pic"), "roompic");
     });
@@ -206,12 +206,12 @@ export function RoomsPage() {
 
           {shown.map((room, index) => (
             <RoomCell
-              key={room.code}
+              key={room.id}
               room={room}
               number={page * perPage + index + 1}
               index={index}
               area={layout.slots[index]}
-              selected={room.code === selected?.code}
+              selected={room.id === selected?.id}
               onSelect={(cell) => select(room, cell)}
               onJoin={() => game.joinRoom(room, "rooms")}
             />
@@ -223,7 +223,7 @@ export function RoomsPage() {
               style={layout.slots[cellCount - 1]}
               onClick={() => {
                 game.setRoomsPageIndex(nextPage);
-                game.setSelectedRoomCode(null);
+                game.setSelectedRoomId(null);
               }}
             >
               <span className="plus">→</span>

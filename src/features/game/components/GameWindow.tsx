@@ -47,10 +47,9 @@ function JoinCodeForm() {
   const [code, setCode] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setCode(code.trim().toUpperCase());
-    if (!joinWithCode(code)) inputRef.current?.focus();
+    if (!(await joinWithCode(code))) inputRef.current?.focus();
   }
 
   return (

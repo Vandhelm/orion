@@ -7,10 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:migrate": "bunx @better-auth/cli migrate --config src/lib/auth.ts"
+    "db:migrate:auth": "bunx @better-auth/cli migrate --config src/lib/auth.ts",
+    "db:migrate:app": "drizzle-kit migrate",
+    "db:migrate": "bun run db:migrate:auth --yes && bun run db:migrate:app",
+    "db:generate": "drizzle-kit generate",
+    "db:seed": "bun src/db/seed.ts"
   },
   "dependencies": {
     "better-auth": "^1.7.7",
+    "drizzle-orm": "^0.45.3",
     "next": "16.3.8",
     "pg": "^8.23.1",
     "react": "19.2.8",
@@ -24,6 +29,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4",

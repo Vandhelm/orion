@@ -1,30 +1,28 @@
 /**
- * Logique des salons de course (maquette locale, sans serveur de jeu).
- * Fonctions pures : aucune dépendance à React ni au DOM, l'aléatoire est injecté.
+ * Règles des salons de course. Fonctions pures : aucune dépendance à React, au DOM ni à la base,
+ * utilisées à la fois par l'interface et par le serveur ; l'aléatoire est injecté.
  * Confidentialité : aucun hôte ni joueur n'est stocké, seulement le nombre de places prises.
  */
 
-export type Visibility = "public" | "semi" | "private";
+export const VISIBILITIES = ["public", "semi-private", "private"] as const;
+export type Visibility = (typeof VISIBILITIES)[number];
 export type RaceMode = "Grand Prix" | "Sprint" | "Contre-la-montre";
 
+/** Salon tel que l'interface le voit (jamais de mot de passe, même haché). */
 export type Room = {
-  code: string;
+  id: string;
   name: string;
   visibility: Visibility;
   players: number;
   maxPlayers: number;
-  mode: RaceMode;
-  /** Salon privé seulement. Maquette : gardé dans le navigateur, à déplacer côté serveur avec le vrai jeu. */
-  password?: string;
-  /** Salon créé par ce joueur : supprimé quand il le quitte vide. */
-  mine?: boolean;
+  mode: string;
 };
 
 export type RandomSource = () => number;
 
 export const VISIBILITY_LABEL: Record<Visibility, string> = {
   public: "Salon public",
-  semi: "Salon semi-privé",
+  "semi-private": "Salon semi-privé",
   private: "Salon privé",
 };
 
@@ -32,48 +30,27 @@ export const MAX_PLAYER_OPTIONS = [4, 6, 8, 10, 12] as const;
 export const DEFAULT_MAX_PLAYERS = 8;
 export const MIN_PLAYERS_TO_START = 2;
 export const ROOM_CODE_LENGTH = 4;
+export const ROOM_NAME_MAX_LENGTH = 28;
 export const MIN_ROOM_PASSWORD_LENGTH = 4;
+export const MAX_ROOM_PASSWORD_LENGTH = 24;
 export const MIN_NAME_LENGTH = 2;
 export const NICKNAME_MAX_LENGTH = 18;
-
-const SEED_ROOMS: readonly Room[] = [
-  { code: "S100", name: "Kakigōri fraise", visibility: "public", players: 5, maxPlayers: 8, mode: "Grand Prix" },
-  { code: "S137", name: "Stand Ramune", visibility: "semi", players: 2, maxPlayers: 6, mode: "Sprint" },
-  { code: "S174", name: "Mochi secret", visibility: "private", players: 5, maxPlayers: 8, mode: "Grand Prix", password: "1234" },
-  { code: "S211", name: "Dango Club", visibility: "public", players: 3, maxPlayers: 10, mode: "Contre-la-montre" },
-  { code: "S248", name: "Cornet géant", visibility: "public", players: 8, maxPlayers: 8, mode: "Grand Prix" },
-  { code: "S285", name: "Glaçons & Cie", visibility: "semi", players: 1, maxPlayers: 4, mode: "Sprint" },
-  { code: "S322", name: "Taiyaki chaud", visibility: "public", players: 6, maxPlayers: 12, mode: "Contre-la-montre" },
-  { code: "S359", name: "Yuzu privé", visibility: "private", players: 4, maxPlayers: 4, mode: "Grand Prix", password: "1234" },
-  { code: "S396", name: "Soft cream", visibility: "public", players: 2, maxPlayers: 6, mode: "Grand Prix" },
-  { code: "S433", name: "Comptoir 42", visibility: "public", players: 4, maxPlayers: 8, mode: "Grand Prix" },
-  { code: "S470", name: "Bâtonnets glacés", visibility: "public", players: 1, maxPlayers: 6, mode: "Sprint" },
-  { code: "S507", name: "Sirop melon", visibility: "public", players: 2, maxPlayers: 4, mode: "Sprint" },
-];
-
-export function createSeedRooms(): Room[] {
-  return SEED_ROOMS.map((room) => ({ ...room }));
-}
 
 export function isFull(room: Room): boolean {
   return room.players >= room.maxPlayers;
 }
 
-export function findRoomByCode(rooms: readonly Room[], code: string): Room | undefined {
-  return rooms.find((room) => room.code === code);
+export function isVisibility(value: unknown): value is Visibility {
+  return VISIBILITIES.includes(value as Visibility);
 }
 
 const CODE_LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-/** Code lettre-chiffre-lettre-chiffre (ex. K7Q2), unique parmi les salons existants. */
-export function generateRoomCode(rooms: readonly Room[], random: RandomSource = Math.random): string {
+/** Code lettre-chiffre-lettre-chiffre (ex. K7Q2). L'unicité est garantie par la base (clé primaire). */
+export function randomRoomCode(random: RandomSource = Math.random): string {
   const letter = () => CODE_LETTERS[Math.floor(random() * CODE_LETTERS.length)];
   const digit = () => String(Math.floor(random() * 10));
-  let code: string;
-  do {
-    code = letter() + digit() + letter() + digit();
-  } while (findRoomByCode(rooms, code));
-  return code;
+  return letter() + digit() + letter() + digit();
 }
 
 /** Garde seulement lettres majuscules et chiffres, comme on tape un code. */
@@ -85,19 +62,21 @@ export function normalizeRoomCode(value: string): string {
 export function validateNickname(value: string): string | null {
   const nickname = value.trim();
   if (nickname.length < MIN_NAME_LENGTH) return "Choisis un surnom d'au moins 2 caractères.";
+  if (nickname.length > NICKNAME_MAX_LENGTH) return `Le surnom compte au plus ${NICKNAME_MAX_LENGTH} caractères.`;
   if (!/^[\wÀ-ÿ .-]+$/.test(nickname)) return "Le surnom ne peut contenir que des lettres, chiffres, espaces, - . et _";
   return null;
 }
 
-export type JoinCodeResult = { room: Room } | { error: string };
-
-export function resolveJoinCode(rooms: readonly Room[], rawCode: string): JoinCodeResult {
-  const code = rawCode.trim().toUpperCase();
+/** Vérifie la forme d'un code saisi (son existence est vérifiée par le serveur). */
+export function validateJoinCode(rawCode: string): { code: string } | { error: string } {
+  const code = normalizeRoomCode(rawCode.trim());
   if (!code) return { error: "Entre le code du salon." };
-  if (code.length < ROOM_CODE_LENGTH) return { error: "Le code compte 4 caractères (ex. K7Q2)." };
-  const room = findRoomByCode(rooms, code);
-  if (!room) return { error: `Aucun salon ne porte le code ${code}. Vérifie-le auprès de la personne qui t'a invité.` };
-  return { room };
+  if (code.length !== ROOM_CODE_LENGTH) return { error: "Le code compte 4 caractères (ex. K7Q2)." };
+  return { code };
+}
+
+export function unknownCodeMessage(code: string): string {
+  return `Aucun salon ne porte le code ${code}. Vérifie-le auprès de la personne qui t'a invité.`;
 }
 
 export type NewRoomInput = {
@@ -107,25 +86,18 @@ export type NewRoomInput = {
   maxPlayers: number;
 };
 
+/** Message d'erreur, ou null si le salon peut être créé. Vérifié côté navigateur et côté serveur. */
 export function validateNewRoom(input: NewRoomInput): string | null {
-  if (input.name.trim().length < MIN_NAME_LENGTH) return "Donne un nom d'au moins 2 caractères à ton salon.";
-  if (input.visibility === "private" && input.password.length < MIN_ROOM_PASSWORD_LENGTH) {
-    return "Le mot de passe compte au moins 4 caractères.";
+  const name = input.name.trim();
+  if (name.length < MIN_NAME_LENGTH) return "Donne un nom d'au moins 2 caractères à ton salon.";
+  if (name.length > ROOM_NAME_MAX_LENGTH) return `Le nom compte au plus ${ROOM_NAME_MAX_LENGTH} caractères.`;
+  if (!isVisibility(input.visibility)) return "Choisis qui peut entrer.";
+  if (!MAX_PLAYER_OPTIONS.includes(input.maxPlayers as (typeof MAX_PLAYER_OPTIONS)[number])) return "Nombre de places invalide.";
+  if (input.visibility === "private") {
+    if (input.password.length < MIN_ROOM_PASSWORD_LENGTH) return "Le mot de passe compte au moins 4 caractères.";
+    if (input.password.length > MAX_ROOM_PASSWORD_LENGTH) return "Le mot de passe compte au plus 24 caractères.";
   }
   return null;
-}
-
-export function createRoom(rooms: readonly Room[], input: NewRoomInput, random: RandomSource = Math.random): Room {
-  return {
-    code: generateRoomCode(rooms, random),
-    name: input.name.trim(),
-    visibility: input.visibility,
-    players: 1,
-    maxPlayers: input.maxPlayers,
-    mode: "Grand Prix",
-    password: input.visibility === "private" ? input.password : undefined,
-    mine: true,
-  };
 }
 
 /** Partie rapide : le salon public ouvert le plus rempli, pour que la course démarre vite. */
@@ -141,26 +113,6 @@ export function listOpenPublicRooms(rooms: readonly Room[], query: string): Room
   const search = query.trim().toLowerCase();
   return rooms.filter(
     (room) => room.visibility === "public" && !isFull(room) && (!search || room.name.toLowerCase().includes(search)),
-  );
-}
-
-export function updatePlayers(rooms: readonly Room[], code: string, delta: number): Room[] {
-  return rooms.map((room) =>
-    room.code === code ? { ...room, players: Math.min(room.maxPlayers, Math.max(0, room.players + delta)) } : room,
-  );
-}
-
-/** Quitter un salon : une place se libère, et un salon à soi qui se vide disparaît. */
-export function leaveRoom(rooms: readonly Room[], code: string): Room[] {
-  return updatePlayers(rooms, code, -1).filter((room) => !(room.code === code && room.mine && room.players === 0));
-}
-
-/** « Actualiser » : chaque salon des autres gagne ou perd au plus un pilote. */
-export function refreshOccupancy(rooms: readonly Room[], random: RandomSource = Math.random): Room[] {
-  return rooms.map((room) =>
-    room.mine
-      ? room
-      : { ...room, players: Math.max(1, Math.min(room.maxPlayers, room.players + Math.round(random() * 2 - 1))) },
   );
 }
 

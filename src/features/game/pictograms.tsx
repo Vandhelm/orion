@@ -116,11 +116,11 @@ const PICTOGRAM_BY_NAME: Record<string, PictogramKey> = {
 
 const PICTOGRAM_KEYS = Object.keys(PICTOGRAMS) as PictogramKey[];
 
-/** Pictogramme du salon : choisi d'après le nom connu, sinon dérivé du code (stable d'un rendu à l'autre). */
+/** Pictogramme du salon : choisi d'après le nom connu, sinon dérivé de son id (stable d'un rendu à l'autre). */
 export function pictogramFor(room: Room): PictogramKey {
   const known = PICTOGRAM_BY_NAME[room.name];
   if (known) return known;
-  const hash = [...room.code].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const hash = [...room.id].reduce((sum, char) => sum + char.charCodeAt(0), 0);
   return PICTOGRAM_KEYS[hash % PICTOGRAM_KEYS.length];
 }
 

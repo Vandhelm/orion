@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { useGame } from "../GameProvider";
-import { DEFAULT_MAX_PLAYERS, MAX_PLAYER_OPTIONS, findRoomByCode, type Visibility } from "../rooms";
+import { DEFAULT_MAX_PLAYERS, MAX_PLAYER_OPTIONS, MAX_ROOM_PASSWORD_LENGTH, ROOM_NAME_MAX_LENGTH, type Visibility } from "../rooms";
 import { StatusMessage } from "./StatusMessage";
 import { WindowBar } from "./WindowBar";
 
@@ -41,7 +41,7 @@ function GameDialog({ open, titleId, title, onSubmit, children }: GameDialogProp
 
 const VISIBILITY_OPTIONS: { value: Visibility; label: string; description: string }[] = [
   { value: "public", label: "Public", description: "Visible dans la liste, entrée libre." },
-  { value: "semi", label: "Semi-privé", description: "Avec le code ; tu acceptes chaque demande." },
+  { value: "semi-private", label: "Semi-privé", description: "Avec le code ; tu acceptes chaque demande." },
   { value: "private", label: "Privé", description: "Avec le code et un mot de passe." },
 ];
 
@@ -57,7 +57,7 @@ function CreateRoomFields({ defaultName }: { defaultName: string }) {
         <label htmlFor="roomName" style={{ fontSize: 20 }}>
           Nom du salon :
         </label>
-        <input ref={nameRef} id="roomName" name="roomName" maxLength={28} autoComplete="off" defaultValue={defaultName} />
+        <input ref={nameRef} id="roomName" name="roomName" maxLength={ROOM_NAME_MAX_LENGTH} autoComplete="off" defaultValue={defaultName} />
       </div>
       <fieldset className="vis">
         <legend style={{ fontSize: 20 }}>Qui peut entrer ?</legend>
@@ -80,7 +80,7 @@ function CreateRoomFields({ defaultName }: { defaultName: string }) {
         <label htmlFor="roomPass" style={{ fontSize: 20 }}>
           Mot de passe (4 caractères min.) :
         </label>
-        <input id="roomPass" name="roomPassword" type="password" maxLength={24} autoComplete="new-password" />
+        <input id="roomPass" name="roomPassword" type="password" maxLength={MAX_ROOM_PASSWORD_LENGTH} autoComplete="new-password" />
       </div>
       <div className="field flex items-center gap-2.5">
         <label htmlFor="roomMax" style={{ fontSize: 20 }}>
@@ -100,11 +100,11 @@ export function CreateRoomDialog() {
   const { dialog, playerName, submitNewRoom, closeDialog } = useGame();
   const open = dialog?.kind === "create";
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const created = submitNewRoom({
+    const created = await submitNewRoom({
       name: String(data.get("roomName") ?? ""),
       visibility: String(data.get("visibility")) as Visibility,
       password: String(data.get("roomPassword") ?? ""),
@@ -130,14 +130,14 @@ export function CreateRoomDialog() {
 }
 
 export function RoomPasswordDialog() {
-  const { dialog, rooms, submitRoomPassword, closeDialog } = useGame();
-  const room = dialog?.kind === "password" ? findRoomByCode(rooms, dialog.code) : undefined;
+  const { dialog, submitRoomPassword, closeDialog } = useGame();
+  const room = dialog?.kind === "password" ? dialog.room : undefined;
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const input = inputRef.current;
-    if (input && !submitRoomPassword(input.value)) input.select();
+    if (input && !(await submitRoomPassword(input.value))) input.select();
   }
 
   return (
@@ -146,7 +146,7 @@ export function RoomPasswordDialog() {
         Mot de passe pour <b>« {room?.name} »</b> :
       </p>
       <div className="field">
-        <input ref={inputRef} key={room?.code} type="password" autoComplete="off" aria-label="Mot de passe" />
+        <input ref={inputRef} key={room?.id} type="password" autoComplete="off" aria-label="Mot de passe" />
       </div>
       <StatusMessage area="password" role="alert" />
       <div className="wfoot">

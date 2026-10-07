@@ -1,23 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import {
-  createRoom,
-  createSeedRooms,
-  generateRoomCode,
   layoutRoomGrid,
-  leaveRoom,
   listOpenPublicRooms,
   normalizeRoomCode,
   paginateRooms,
   pickQuickPlayRoom,
-  refreshOccupancy,
-  resolveJoinCode,
+  randomRoomCode,
+  validateJoinCode,
   validateNewRoom,
   validateNickname,
   type Room,
 } from "./rooms";
 
 const room = (overrides: Partial<Room>): Room => ({
-  code: "A1B2",
+  id: "A1B2",
   name: "Test",
   visibility: "public",
   players: 1,
@@ -26,70 +22,62 @@ const room = (overrides: Partial<Room>): Room => ({
   ...overrides,
 });
 
-/** Source aléatoire qui rejoue une suite de valeurs. */
-const sequence = (...values: number[]) => {
-  let i = 0;
-  return () => values[i++ % values.length];
-};
-
 describe("validateNickname", () => {
   test("accepte un surnom simple", () => expect(validateNickname("Corail_418")).toBeNull());
   test("refuse un surnom trop court", () => expect(validateNickname(" a ")).toContain("au moins 2"));
+  test("refuse un surnom trop long", () => expect(validateNickname("x".repeat(19))).toContain("au plus"));
   test("refuse les caractères spéciaux", () => expect(validateNickname("<script>")).toContain("ne peut contenir"));
 });
 
 describe("codes de salon", () => {
   test("normalizeRoomCode garde majuscules et chiffres", () => expect(normalizeRoomCode("k7-q2 ")).toBe("K7Q2"));
 
-  test("resolveJoinCode trouve le salon", () => {
-    const rooms = createSeedRooms();
-    expect(resolveJoinCode(rooms, " s100 ")).toEqual({ room: rooms[0] });
+  test("validateJoinCode accepte et normalise un code", () => expect(validateJoinCode(" k7q2 ")).toEqual({ code: "K7Q2" }));
+
+  test("validateJoinCode explique chaque erreur", () => {
+    expect(validateJoinCode("")).toEqual({ error: "Entre le code du salon." });
+    expect(validateJoinCode("K7")).toMatchObject({ error: expect.stringContaining("4 caractères") });
   });
 
-  test("resolveJoinCode explique chaque erreur", () => {
-    const rooms = createSeedRooms();
-    expect(resolveJoinCode(rooms, "")).toEqual({ error: "Entre le code du salon." });
-    expect(resolveJoinCode(rooms, "K7")).toMatchObject({ error: expect.stringContaining("4 caractères") });
-    expect(resolveJoinCode(rooms, "ZZ99")).toMatchObject({ error: expect.stringContaining("ZZ99") });
-  });
-
-  test("generateRoomCode évite un code déjà pris", () => {
-    // Premier tirage : A0A0 (déjà pris), second : B1B1.
-    const random = sequence(0, 0, 0, 0, 1 / 24, 0.1, 1 / 24, 0.1);
-    expect(generateRoomCode([room({ code: "A0A0" })], random)).toBe("B1B1");
+  test("randomRoomCode suit le format lettre-chiffre-lettre-chiffre", () => {
+    expect(randomRoomCode(() => 0)).toBe("A0A0");
+    expect(randomRoomCode()).toMatch(/^[A-Z]\d[A-Z]\d$/);
   });
 });
 
-describe("création de salon", () => {
+describe("validateNewRoom", () => {
   const input = { name: "Mon salon", visibility: "private" as const, password: "abcd", maxPlayers: 6 };
 
-  test("validateNewRoom exige un nom et un mot de passe pour un salon privé", () => {
+  test("accepte un salon valide", () => {
     expect(validateNewRoom(input)).toBeNull();
-    expect(validateNewRoom({ ...input, name: "x" })).toContain("nom");
-    expect(validateNewRoom({ ...input, password: "abc" })).toContain("mot de passe");
     expect(validateNewRoom({ ...input, visibility: "public", password: "" })).toBeNull();
   });
 
-  test("createRoom crée un salon à soi avec une place prise", () => {
-    const created = createRoom([], input, sequence(0.5));
-    expect(created).toMatchObject({ name: "Mon salon", players: 1, maxPlayers: 6, mine: true, password: "abcd" });
-    expect(created.code).toMatch(/^[A-Z]\d[A-Z]\d$/);
+  test("refuse un nom trop court ou trop long", () => {
+    expect(validateNewRoom({ ...input, name: "x" })).toContain("nom");
+    expect(validateNewRoom({ ...input, name: "x".repeat(29) })).toContain("au plus");
   });
 
-  test("un salon public ne garde pas de mot de passe", () => {
-    expect(createRoom([], { ...input, visibility: "public" }).password).toBeUndefined();
+  test("exige un mot de passe de 4 à 24 caractères pour un salon privé", () => {
+    expect(validateNewRoom({ ...input, password: "abc" })).toContain("au moins 4");
+    expect(validateNewRoom({ ...input, password: "x".repeat(25) })).toContain("au plus 24");
+  });
+
+  test("refuse une visibilité ou un nombre de places inventés", () => {
+    expect(validateNewRoom({ ...input, visibility: "secret" as never })).toContain("qui peut entrer");
+    expect(validateNewRoom({ ...input, maxPlayers: 99 })).toContain("places");
   });
 });
 
 describe("pickQuickPlayRoom", () => {
   test("choisit le salon public ouvert le plus rempli", () => {
     const rooms = [
-      room({ code: "A", players: 2, maxPlayers: 8 }),
-      room({ code: "B", players: 5, maxPlayers: 6 }),
-      room({ code: "C", players: 4, maxPlayers: 4 }), // complet
-      room({ code: "D", players: 7, maxPlayers: 8, visibility: "semi" }),
+      room({ id: "A", players: 2, maxPlayers: 8 }),
+      room({ id: "B", players: 5, maxPlayers: 6 }),
+      room({ id: "C", players: 4, maxPlayers: 4 }), // complet
+      room({ id: "D", players: 7, maxPlayers: 8, visibility: "semi-private" }),
     ];
-    expect(pickQuickPlayRoom(rooms)?.code).toBe("B");
+    expect(pickQuickPlayRoom(rooms)?.id).toBe("B");
   });
 
   test("renvoie null s'il n'y a aucun salon public ouvert", () => {
@@ -99,35 +87,23 @@ describe("pickQuickPlayRoom", () => {
 
 describe("listOpenPublicRooms", () => {
   test("filtre les salons publics non complets selon la recherche", () => {
-    const names = listOpenPublicRooms(createSeedRooms(), "SO").map((r) => r.name);
-    expect(names).toEqual(["Soft cream"]);
-  });
-});
-
-describe("leaveRoom et refreshOccupancy", () => {
-  test("quitter son propre salon vide le supprime", () => {
-    expect(leaveRoom([room({ code: "M", mine: true, players: 1 })], "M")).toEqual([]);
-  });
-
-  test("quitter le salon d'un autre libère une place", () => {
-    expect(leaveRoom([room({ code: "X", players: 3 })], "X")[0].players).toBe(2);
-  });
-
-  test("actualiser reste entre 1 et le maximum et ne touche pas à ses salons", () => {
-    const rooms = [room({ players: 8 }), room({ players: 1 }), room({ players: 3, mine: true })];
-    const refreshed = refreshOccupancy(rooms, sequence(1, 0, 1));
-    expect(refreshed.map((r) => r.players)).toEqual([8, 1, 3]);
+    const rooms = [
+      room({ id: "A", name: "Soft cream" }),
+      room({ id: "B", name: "Sorbet", players: 8 }),
+      room({ id: "C", name: "Soupe", visibility: "private" }),
+    ];
+    expect(listOpenPublicRooms(rooms, "SO").map((r) => r.id)).toEqual(["A"]);
   });
 });
 
 describe("grille des salons", () => {
   test("paginateRooms garde 16 cases sur une seule page", () => {
-    const list = Array.from({ length: 16 }, (_, i) => room({ code: String(i) }));
+    const list = Array.from({ length: 16 }, (_, i) => room({ id: String(i) }));
     expect(paginateRooms(list, 0)).toMatchObject({ pageCount: 1, perPage: 16 });
   });
 
   test("paginateRooms réserve une case « suite » au-delà de 16", () => {
-    const list = Array.from({ length: 20 }, (_, i) => room({ code: String(i) }));
+    const list = Array.from({ length: 20 }, (_, i) => room({ id: String(i) }));
     const second = paginateRooms(list, 1);
     expect(second).toMatchObject({ pageCount: 2, perPage: 15, page: 1 });
     expect(second.shown).toHaveLength(5);

@@ -1,28 +1,19 @@
 "use client";
 
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-  type RefObject,
-} from "react";
+  createRoomAction,
+  getRoomAction,
+  joinRoomAction,
+  leaveRoomAction,
+  listRoomsAction,
+  quickPlayAction,
+} from "./actions";
 import { AVATARS, type Avatar } from "./creatures";
 import {
   MIN_PLAYERS_TO_START,
-  createRoom,
-  createSeedRooms,
-  findRoomByCode,
   isFull,
-  leaveRoom,
-  pickQuickPlayRoom,
-  refreshOccupancy,
-  resolveJoinCode,
-  updatePlayers,
+  validateJoinCode,
   validateNewRoom,
   validateNickname,
   type NewRoomInput,
@@ -36,15 +27,21 @@ export type StatusArea = "home" | "auth" | "lobby" | "rooms" | "create" | "passw
 export type Status = { message: string; error: boolean };
 export type PlayerAccount = { name: string };
 
-type Lobby = { code: string; host: boolean; started: boolean };
-type Dialog = { kind: "create"; area: StatusArea } | { kind: "password"; code: string; area: StatusArea } | null;
+type Lobby = { room: Room; host: boolean; started: boolean };
+type Dialog = { kind: "create"; area: StatusArea } | { kind: "password"; room: Room; area: StatusArea } | null;
+type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
 const DEFAULT_NICKNAME = "Corail_418";
+/** Petite attente volontaire de la maquette : « Recherche d'un salon… » reste lisible. */
 const QUICK_PLAY_DELAY_MS = 900;
+/** L'accord de l'hôte d'un salon semi-privé est simulé (pas encore de système de demandes). */
 const SEMI_PRIVATE_DELAY_MS = 1600;
-const LOBBY_FILL_INTERVAL_MS = 2500;
+/** Rafraîchit les places de la salle d'attente : les autres pilotes arrivent en vrai. */
+const LOBBY_POLL_INTERVAL_MS = 2500;
 const SCROLL_DELAY_WITH_TRANSITION_MS = 380;
 const SCROLL_DELAY_MS = 30;
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 type GameRefs = {
   nicknameRef: RefObject<HTMLInputElement | null>;
@@ -72,9 +69,8 @@ type GameContextValue = GameRefs & {
   activeWindow: GameWindowName;
   homeRevealed: boolean;
   roomsOpen: boolean;
-  rooms: Room[];
+  publicRooms: Room[];
   lobby: Lobby | null;
-  lobbyRoom: Room | undefined;
   statuses: Partial<Record<StatusArea, Status>>;
   say: (area: StatusArea, message: string, error?: boolean) => void;
   hush: (area: StatusArea) => void;
@@ -85,14 +81,14 @@ type GameContextValue = GameRefs & {
   setRoomsQuery: (query: string) => void;
   roomsPageIndex: number;
   setRoomsPageIndex: (page: number) => void;
-  selectedRoomCode: string | null;
-  setSelectedRoomCode: (code: string | null) => void;
+  selectedRoomId: string | null;
+  setSelectedRoomId: (id: string | null) => void;
   quickPlay: () => void;
-  joinWithCode: (rawCode: string) => boolean;
+  joinWithCode: (rawCode: string) => Promise<boolean>;
   joinRoom: (room: Room, area: StatusArea) => void;
-  submitRoomPassword: (password: string) => boolean;
+  submitRoomPassword: (password: string) => Promise<boolean>;
   openCreateRoom: (area: StatusArea) => void;
-  submitNewRoom: (input: NewRoomInput) => boolean;
+  submitNewRoom: (input: NewRoomInput) => Promise<boolean>;
   leaveLobby: () => void;
   startRace: () => void;
   copyLobbyCode: () => void;
@@ -124,8 +120,9 @@ type GameProviderProps = {
 };
 
 /**
- * État du jeu (maquette locale) : mode de connexion, pilote, salons, salle d'attente,
- * fenêtres et boîtes de dialogue. Les règles vivent dans `rooms.ts` ; ici, on orchestre.
+ * État de la page de jeu : mode de connexion, pilote, salons, salle d'attente, fenêtres et
+ * boîtes de dialogue. Les salons vivent en base (Server Actions de `actions.ts`) ; les règles
+ * pures dans `rooms.ts`. Ici, on orchestre l'interface.
  */
 export function GameProvider({ initialAccount, socialSignInFailed = false, children }: GameProviderProps) {
   const nicknameRef = useRef<HTMLInputElement>(null);
@@ -145,8 +142,7 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
   const [activeWindow, setActiveWindow] = useState<GameWindowName>("home");
   const [homeRevealed, setHomeRevealed] = useState(true);
   const [roomsOpen, setRoomsOpen] = useState(false);
-  const [rooms, setRooms] = useState<Room[]>(createSeedRooms);
-  const roomsRef = useRef(rooms);
+  const [publicRooms, setPublicRooms] = useState<Room[]>([]);
   const [lobby, setLobby] = useState<Lobby | null>(null);
   const [statuses, setStatuses] = useState<Partial<Record<StatusArea, Status>>>(() =>
     socialSignInFailed ? { auth: { message: "La connexion a échoué. Réessaie.", error: true } } : {},
@@ -155,15 +151,9 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
   const [dialog, setDialog] = useState<Dialog>(null);
   const [roomsQuery, setRoomsQuery] = useState("");
   const [roomsPageIndex, setRoomsPageIndex] = useState(0);
-  const [selectedRoomCode, setSelectedRoomCode] = useState<string | null>(null);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
   const playerName = mode === "auth" && account ? account.name : nickname.trim();
-
-  /** Les minuteries lisent toujours la liste à jour grâce à la référence. */
-  const updateRooms = useCallback((update: (rooms: Room[]) => Room[]) => {
-    roomsRef.current = update(roomsRef.current);
-    setRooms(roomsRef.current);
-  }, []);
 
   const say = useCallback((area: StatusArea, message: string, error = false) => {
     setStatuses((current) => ({ ...current, [area]: { message, error } }));
@@ -172,6 +162,22 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
   const hush = useCallback((area: StatusArea) => {
     setStatuses((current) => ({ ...current, [area]: undefined }));
   }, []);
+
+  /** Lance une action serveur en bloquant les autres boutons, et affiche son erreur dans `area`. */
+  async function runAction<T>(area: StatusArea, action: Promise<ActionResult<T>>): Promise<T | null> {
+    setBusy(true);
+    try {
+      const result = await action;
+      if (result.ok) return result.data;
+      say(area, result.error, true);
+      return null;
+    } catch {
+      say(area, "Le serveur ne répond pas. Réessaie dans un instant.", true);
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  }
 
   /* ---------- Fenêtres ---------- */
 
@@ -204,10 +210,21 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
     focusAfter(transition, focusTarget ?? windowElement?.querySelector("h2"));
   }
 
+  async function loadPublicRooms(): Promise<boolean> {
+    try {
+      setPublicRooms(await listRoomsAction());
+      return true;
+    } catch {
+      say("rooms", "Impossible de charger les salons. Réessaie avec ↻.", true);
+      return false;
+    }
+  }
+
   function openRooms() {
     hush("rooms");
     setRoomsQuery("");
     setRoomsPageIndex(0);
+    void loadPublicRooms();
     setTransitionName(roomsButtonRef.current, "salons");
     const transition = withViewTransition(() => {
       setTransitionName(roomsButtonRef.current);
@@ -225,6 +242,10 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
 
   function closeRooms() {
     showWindow("home", roomsButtonRef.current);
+  }
+
+  async function refreshRooms() {
+    if (await loadPublicRooms()) say("rooms", "Liste actualisée.");
   }
 
   /* ---------- Pilote ---------- */
@@ -269,29 +290,22 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
   /* ---------- Salle d'attente ---------- */
 
   function enterLobby(room: Room, host: boolean, message?: string) {
-    setLobby({ code: room.code, host, started: false });
+    setLobby({ room, host, started: false });
     hush("lobby");
     showWindow("lobby");
     if (message) say("lobby", message);
     else if (!host) say("lobby", "Sur la grille : en attente que l'hôte donne le départ…");
   }
 
-  function joinAndEnter(room: Room) {
-    updateRooms((current) => updatePlayers(current, room.code, 1));
-    enterLobby(room, false);
-  }
-
   function leaveLobby() {
-    if (lobby) updateRooms((current) => leaveRoom(current, lobby.code));
+    if (lobby) void leaveRoomAction(lobby.room.id);
     setLobby(null);
     showWindow("home", playButtonRef.current);
   }
 
-  const lobbyRoom = lobby ? findRoomByCode(rooms, lobby.code) : undefined;
-
   function startRace() {
-    if (!lobby || !lobbyRoom) return;
-    if (lobbyRoom.players < MIN_PLAYERS_TO_START) {
+    if (!lobby) return;
+    if (lobby.room.players < MIN_PLAYERS_TO_START) {
       say("lobby", "Il faut au moins 2 pilotes pour donner le départ.", true);
       return;
     }
@@ -301,103 +315,82 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
 
   function copyLobbyCode() {
     if (!lobby) return;
-    const { code } = lobby;
-    const fallback = () => say("lobby", `Copie impossible ici : note le code ${code}.`);
+    const { id } = lobby.room;
+    const fallback = () => say("lobby", `Copie impossible ici : note le code ${id}.`);
     if (!navigator.clipboard?.writeText) return fallback();
-    navigator.clipboard.writeText(code).then(() => say("lobby", `Code ${code} copié. Envoie-le à tes amis.`), fallback);
+    navigator.clipboard.writeText(id).then(() => say("lobby", `Code ${id} copié. Envoie-le à tes amis.`), fallback);
   }
 
-  // D'autres pilotes (anonymes) arrivent de temps en temps tant que la course n'a pas démarré.
-  const fillingCode = lobby && !lobby.started ? lobby.code : null;
+  // Les places se mettent à jour quand d'autres pilotes arrivent ou partent, tant que la course n'a pas démarré.
+  const waitingRoomId = lobby && !lobby.started ? lobby.room.id : null;
   useEffect(() => {
-    if (!fillingCode) return;
-    const timer = setInterval(() => {
-      if (Math.random() < 0.5) {
-        updateRooms((current) => {
-          const room = findRoomByCode(current, fillingCode);
-          return room && !isFull(room) ? updatePlayers(current, fillingCode, 1) : current;
-        });
-      }
-    }, LOBBY_FILL_INTERVAL_MS);
+    if (!waitingRoomId) return;
+    const timer = setInterval(async () => {
+      const result = await getRoomAction(waitingRoomId).catch(() => null);
+      if (!result?.ok) return;
+      setLobby((current) => (current?.room.id === waitingRoomId ? { ...current, room: result.data } : current));
+    }, LOBBY_POLL_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [fillingCode, updateRooms]);
+  }, [waitingRoomId]);
 
   /* ---------- Rejoindre ---------- */
 
   /** Rejoindre depuis l'interface : vérifie d'abord le pilote. */
   function joinRoom(room: Room, area: StatusArea) {
     if (busy || !checkPlayer(area)) return;
-    tryJoin(room, area);
+    void tryJoin(room, area);
   }
 
-  function tryJoin(room: Room, area: StatusArea) {
+  async function tryJoin(room: Room, area: StatusArea) {
     if (isFull(room)) return say(area, `« ${room.name} » est complet.`, true);
     if (room.visibility === "private") {
       hush("password");
-      setDialog({ kind: "password", code: room.code, area });
+      setDialog({ kind: "password", room, area });
       return;
     }
-    if (room.visibility === "semi") {
+    if (room.visibility === "semi-private") {
       say(area, `Demande envoyée à l'hôte de « ${room.name} »… En attente de sa réponse.`);
       setBusy(true);
-      setTimeout(() => {
-        setBusy(false);
-        const latest = findRoomByCode(roomsRef.current, room.code);
-        if (!latest || isFull(latest)) return say(area, `« ${room.name} » s'est rempli entre-temps.`, true);
-        joinAndEnter(latest);
-      }, SEMI_PRIVATE_DELAY_MS);
-      return;
+      await wait(SEMI_PRIVATE_DELAY_MS);
     }
-    joinAndEnter(room);
+    const joined = await runAction(area, joinRoomAction(room.id));
+    if (joined) enterLobby(joined, false);
   }
 
   /** Renvoie false seulement si le code est refusé : le formulaire remet alors le focus sur son champ. */
-  function joinWithCode(rawCode: string): boolean {
+  async function joinWithCode(rawCode: string): Promise<boolean> {
     if (busy || !checkPlayer("home")) return true;
-    const result = resolveJoinCode(roomsRef.current, rawCode);
-    if ("error" in result) {
-      say("home", result.error, true);
+    const check = validateJoinCode(rawCode);
+    if ("error" in check) {
+      say("home", check.error, true);
       return false;
     }
-    tryJoin(result.room, "home");
+    const room = await runAction("home", getRoomAction(check.code));
+    if (!room) return false;
+    await tryJoin(room, "home");
     return true;
   }
 
-  function submitRoomPassword(password: string): boolean {
-    const room = dialog?.kind === "password" ? findRoomByCode(roomsRef.current, dialog.code) : undefined;
-    if (!room) return false;
+  async function submitRoomPassword(password: string): Promise<boolean> {
+    if (dialog?.kind !== "password") return false;
     if (!password) {
       say("password", "Entre le mot de passe.", true);
       return false;
     }
-    if (password !== room.password) {
-      say("password", "Mot de passe incorrect.", true);
-      return false;
-    }
+    const joined = await runAction("password", joinRoomAction(dialog.room.id, password));
+    if (!joined) return false;
     setDialog(null);
-    joinAndEnter(room);
+    enterLobby(joined, false);
     return true;
   }
 
   /* ---------- JOUER : partie rapide ---------- */
 
-  function quickPlay() {
+  async function quickPlay() {
     if (busy || !checkPlayer("home")) return;
-    setBusy(true);
     say("home", "Recherche d'un salon public…");
-    setTimeout(() => {
-      setBusy(false);
-      const room = pickQuickPlayRoom(roomsRef.current);
-      if (room) return joinAndEnter(room);
-      const own = createRoom(roomsRef.current, {
-        name: `Salon de ${playerName}`,
-        visibility: "public",
-        password: "",
-        maxPlayers: 8,
-      });
-      updateRooms((current) => [own, ...current]);
-      enterLobby(own, true);
-    }, QUICK_PLAY_DELAY_MS);
+    const [seat] = await Promise.all([runAction("home", quickPlayAction(playerName)), wait(QUICK_PLAY_DELAY_MS)]);
+    if (seat) enterLobby(seat.room, seat.host);
   }
 
   /* ---------- Créer un salon ---------- */
@@ -408,14 +401,14 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
     setDialog({ kind: "create", area });
   }
 
-  function submitNewRoom(input: NewRoomInput): boolean {
+  async function submitNewRoom(input: NewRoomInput): Promise<boolean> {
     const error = validateNewRoom(input);
     if (error) {
       say("create", error, true);
       return false;
     }
-    const room = createRoom(roomsRef.current, input);
-    updateRooms((current) => [room, ...current]);
+    const room = await runAction("create", createRoomAction(input));
+    if (!room) return false;
     setDialog(null);
     const shareHint = room.visibility === "private" ? " et le mot de passe." : ".";
     enterLobby(
@@ -423,14 +416,9 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
       true,
       room.visibility === "public"
         ? "Salon créé : il apparaît dans la liste des salons publics."
-        : `Salon créé. Il n'apparaît pas dans la liste : partage le code ${room.code}${shareHint}`,
+        : `Salon créé. Il n'apparaît pas dans la liste : partage le code ${room.id}${shareHint}`,
     );
     return true;
-  }
-
-  function refreshRooms() {
-    updateRooms((current) => refreshOccupancy(current));
-    say("rooms", "Liste actualisée.");
   }
 
   const value: GameContextValue = {
@@ -455,9 +443,8 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
     activeWindow,
     homeRevealed,
     roomsOpen,
-    rooms,
+    publicRooms,
     lobby,
-    lobbyRoom,
     statuses,
     say,
     hush,
@@ -468,8 +455,8 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
     setRoomsQuery,
     roomsPageIndex,
     setRoomsPageIndex,
-    selectedRoomCode,
-    setSelectedRoomCode,
+    selectedRoomId,
+    setSelectedRoomId,
     quickPlay,
     joinWithCode,
     joinRoom,
