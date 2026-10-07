@@ -11,7 +11,7 @@ import { Intro } from "./Intro";
 import { Masthead } from "./Masthead";
 import "../orion.css";
 
-/** Page d'accueil O.R.I.O.N (maquette orion.html) : intro, colonne journal, fenêtre de jeu, salons. */
+/** Page d'accueil O.R.I.O.N : intro, colonne journal, fenêtre de jeu, salons. */
 export function OrionHome({ initialAccount }: { initialAccount: PlayerAccount | null }) {
   return (
     <ReplayProvider>

@@ -7,7 +7,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ───────────── 1. Palette : nom → hexadécimal (seul endroit où un hexadécimal apparaît) ───────────── */
-/* Couleurs extraites de la maquette orion.html (quasi-doublons fusionnés : #141414 et #000 → neutral-950, #f1f1f1 → neutral-100, #777 et #888 → neutral-500). */
+/* Couleurs de la maquette d'origine (quasi-doublons fusionnés : #141414 et #000 → neutral-950, #f1f1f1 → neutral-100, #777 et #888 → neutral-500). */
 @theme {
   --color-white: #FFFFFF;       /* papier */
   --color-neutral-100: #F2F2F2; /* survol des cases de salon */
