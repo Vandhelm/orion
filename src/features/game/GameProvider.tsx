@@ -13,6 +13,7 @@ import {
   roomStateAction,
 } from "./actions";
 import { AVATARS, type Avatar } from "./creatures";
+import { publicOrigin } from "./public-origin";
 import {
   MIN_PLAYERS_TO_START,
   PRIVATE_ROOM_MESSAGE,
@@ -375,7 +376,7 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, share
   async function createInvitationLink(): Promise<string | null> {
     if (!lobby) return null;
     const token = await runAction("lobby", createInviteAction(lobby.room.id));
-    return token ? invitationLink(window.location.origin, token) : null;
+    return token ? invitationLink(publicOrigin(), token) : null;
   }
 
   async function redeemInvitation(token: string) {

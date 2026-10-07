@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useGame } from "../GameProvider";
+import { publicOrigin } from "../public-origin";
 import { roomLink, type Room } from "../rooms";
 import { QrCode } from "./QrCode";
 
@@ -21,7 +22,7 @@ export function SharePanel({ room }: { room: Room }) {
   }
 
   function shareRoomLink() {
-    const link = roomLink(window.location.origin, room.id);
+    const link = roomLink(publicOrigin(), room.id);
     setShared({ link, label: `QR code du salon ${room.name}` });
     copy(link, "Lien du salon copié. Envoie-le à tes amis.");
   }
