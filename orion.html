@@ -779,33 +779,6 @@ body.rooms-open #winHome,body.rooms-open #winLobby,body.rooms-open #panelAnon,bo
 }
 .cards li.mock svg{padding:0 !important;background:#fff !important;color:#bdbdbd !important;border:2px dashed #bdbdbd !important}
 .cards li.mock b{color:#121212 !important}.cards li.mock span{color:#888}
-
-/* ================= Compacité verticale : même style, moins de hauteur =================
-   Le contenu dépassait largement un écran (hero 290px fixe + soleil 330px fixe + fenêtre
-   de jeu avec ses 3 boutons empilés + .scene forcée à min-height:100vh). On resserre les
-   paddings/gaps, on réduit les blocs purement décoratifs (soleil), et deux des trois
-   boutons d'action passent côte à côte au lieu d'empiler trois lignes. Rien n'est supprimé :
-   mêmes sections, mêmes couleurs, juste moins d'air. */
-.scene{min-height:0}
-.hero{min-height:0;padding:16px 12px 18px}
-.sun{height:210px}
-.bcircle{width:168px;height:168px;margin:-84px 0 0 -84px}
-.redblock{padding:20px 18px 24px}
-.lead{margin:0 auto 16px}
-.wbody{padding:14px 20px 18px;gap:12px}
-.acts{gap:10px;flex-direction:row;flex-wrap:wrap}
-.acts #btnPlay{flex:1 1 100%}
-.acts #btnCreate,.acts #btnRooms{flex:1 1 calc(50% - 5px)}
-.tagline{margin:16px auto 18px}
-.how{padding:0 10px 4px}
-.pfoot{margin:14px 10px 12px;padding-top:6px}
-.backband{top:420px !important;height:340px !important}
-@media (max-width:1099px){.backband{top:390px !important;height:300px !important}}
-@media (max-width:719px){
-  .sun{height:190px}
-  .bcircle{width:148px;height:148px;margin:-74px 0 0 -74px}
-  .backband{top:330px !important;height:250px !important}
-}
 </style>
 </head>
 <body>
