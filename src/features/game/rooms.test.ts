@@ -46,21 +46,16 @@ describe("codes de salon", () => {
 });
 
 describe("validateNewRoom", () => {
-  const input = { name: "Mon salon", visibility: "private" as const, password: "abcd", maxPlayers: 6 };
+  const input = { name: "Mon salon", visibility: "private" as const, maxPlayers: 6 };
 
   test("accepte un salon valide", () => {
     expect(validateNewRoom(input)).toBeNull();
-    expect(validateNewRoom({ ...input, visibility: "public", password: "" })).toBeNull();
+    expect(validateNewRoom({ ...input, visibility: "semi-public" })).toBeNull();
   });
 
   test("refuse un nom trop court ou trop long", () => {
     expect(validateNewRoom({ ...input, name: "x" })).toContain("nom");
     expect(validateNewRoom({ ...input, name: "x".repeat(29) })).toContain("au plus");
-  });
-
-  test("exige un mot de passe de 4 à 24 caractères pour un salon privé", () => {
-    expect(validateNewRoom({ ...input, password: "abc" })).toContain("au moins 4");
-    expect(validateNewRoom({ ...input, password: "x".repeat(25) })).toContain("au plus 24");
   });
 
   test("refuse une visibilité ou un nombre de places inventés", () => {
@@ -75,7 +70,7 @@ describe("pickQuickPlayRoom", () => {
       room({ id: "A", players: 2, maxPlayers: 8 }),
       room({ id: "B", players: 5, maxPlayers: 6 }),
       room({ id: "C", players: 4, maxPlayers: 4 }), // complet
-      room({ id: "D", players: 7, maxPlayers: 8, visibility: "semi-private" }),
+      room({ id: "D", players: 7, maxPlayers: 8, visibility: "semi-public" }),
     ];
     expect(pickQuickPlayRoom(rooms)?.id).toBe("B");
   });

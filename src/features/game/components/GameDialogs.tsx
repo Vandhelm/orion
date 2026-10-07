@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { useGame } from "../GameProvider";
-import { DEFAULT_MAX_PLAYERS, MAX_PLAYER_OPTIONS, MAX_ROOM_PASSWORD_LENGTH, ROOM_NAME_MAX_LENGTH, type Visibility } from "../rooms";
+import { DEFAULT_MAX_PLAYERS, MAX_PLAYER_OPTIONS, ROOM_NAME_MAX_LENGTH, type Visibility } from "../rooms";
 import { StatusMessage } from "./StatusMessage";
 import { WindowBar } from "./WindowBar";
 
@@ -40,9 +40,9 @@ function GameDialog({ open, titleId, title, onSubmit, children }: GameDialogProp
 }
 
 const VISIBILITY_OPTIONS: { value: Visibility; label: string; description: string }[] = [
-  { value: "public", label: "Public", description: "Visible dans la liste, entrée libre." },
-  { value: "semi-private", label: "Semi-privé", description: "Avec le code ; tu acceptes chaque demande." },
-  { value: "private", label: "Privé", description: "Avec le code et un mot de passe." },
+  { value: "public", label: "Public", description: "Affiché dans la liste, n'importe qui peut entrer." },
+  { value: "semi-public", label: "Semi-public", description: "Hors de la liste : on entre avec le code, le lien ou le QR code." },
+  { value: "private", label: "Privé", description: "Sur invitation : chaque lien ne sert qu'une fois." },
 ];
 
 /** Champs du formulaire « Créer un salon », remis à zéro à chaque ouverture (monté à neuf). */
@@ -76,12 +76,6 @@ function CreateRoomFields({ defaultName }: { defaultName: string }) {
           </label>
         ))}
       </fieldset>
-      <div className="field flex flex-col gap-1" hidden={visibility !== "private"}>
-        <label htmlFor="roomPass" style={{ fontSize: 20 }}>
-          Mot de passe (4 caractères min.) :
-        </label>
-        <input id="roomPass" name="roomPassword" type="password" maxLength={MAX_ROOM_PASSWORD_LENGTH} autoComplete="new-password" />
-      </div>
       <div className="field flex items-center gap-2.5">
         <label htmlFor="roomMax" style={{ fontSize: 20 }}>
           Places :
@@ -107,7 +101,6 @@ export function CreateRoomDialog() {
     const created = await submitNewRoom({
       name: String(data.get("roomName") ?? ""),
       visibility: String(data.get("visibility")) as Visibility,
-      password: String(data.get("roomPassword") ?? ""),
       maxPlayers: Number(data.get("maxPlayers")),
     });
     if (!created) form.querySelector<HTMLInputElement>("[aria-invalid], #roomName")?.focus();
@@ -123,38 +116,6 @@ export function CreateRoomDialog() {
         </button>
         <button className="submit main small" type="submit">
           CRÉER
-        </button>
-      </div>
-    </GameDialog>
-  );
-}
-
-export function RoomPasswordDialog() {
-  const { dialog, submitRoomPassword, closeDialog } = useGame();
-  const room = dialog?.kind === "password" ? dialog.room : undefined;
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const input = inputRef.current;
-    if (input && !(await submitRoomPassword(input.value))) input.select();
-  }
-
-  return (
-    <GameDialog open={!!room} titleId="tPass" title="Salon privé" onSubmit={submit}>
-      <p className="m-0" style={{ fontSize: 20 }}>
-        Mot de passe pour <b>« {room?.name} »</b> :
-      </p>
-      <div className="field">
-        <input ref={inputRef} key={room?.id} type="password" autoComplete="off" aria-label="Mot de passe" />
-      </div>
-      <StatusMessage area="password" role="alert" />
-      <div className="wfoot">
-        <button className="mini" type="button" onClick={closeDialog}>
-          ANNULER
-        </button>
-        <button className="submit main small" type="submit">
-          ENTRER
         </button>
       </div>
     </GameDialog>

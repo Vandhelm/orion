@@ -10,5 +10,5 @@ export default defineConfig({
   out: "./drizzle",
   dbCredentials: { url: process.env.DATABASE_URL! },
   // Drizzle ne gère que ses tables : celles de Better Auth ont leur propre migration.
-  tablesFilter: ["room"],
+  tablesFilter: ["room", "room_invite"],
 });

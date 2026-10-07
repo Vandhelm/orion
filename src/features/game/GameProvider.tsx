@@ -2,16 +2,22 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
+  createInviteAction,
   createRoomAction,
-  getRoomAction,
+  findRoomByCodeAction,
   joinRoomAction,
   leaveRoomAction,
   listRoomsAction,
   quickPlayAction,
+  redeemInviteAction,
+  roomStateAction,
 } from "./actions";
 import { AVATARS, type Avatar } from "./creatures";
 import {
   MIN_PLAYERS_TO_START,
+  PRIVATE_ROOM_MESSAGE,
+  canJoinWithCode,
+  invitationLink,
   isFull,
   validateJoinCode,
   validateNewRoom,
@@ -23,19 +29,19 @@ import { playEnterAnimation, setTransitionName, withViewTransition } from "./vie
 
 export type Mode = "anon" | "auth";
 export type GameWindowName = "home" | "lobby";
-export type StatusArea = "home" | "auth" | "lobby" | "rooms" | "create" | "password";
+export type StatusArea = "home" | "auth" | "lobby" | "rooms" | "create";
 export type Status = { message: string; error: boolean };
 export type PlayerAccount = { name: string };
 
 type Lobby = { room: Room; host: boolean; started: boolean };
-type Dialog = { kind: "create"; area: StatusArea } | { kind: "password"; room: Room; area: StatusArea } | null;
+type Dialog = { kind: "create"; area: StatusArea } | null;
+/** Arrivée par un lien partagé : code d'un salon (public ou semi-public) ou invitation à un salon privé. */
+export type SharedLink = { kind: "room"; code: string } | { kind: "invitation"; token: string };
 type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
 const DEFAULT_NICKNAME = "Corail_418";
 /** Petite attente volontaire de la maquette : « Recherche d'un salon… » reste lisible. */
 const QUICK_PLAY_DELAY_MS = 900;
-/** L'accord de l'hôte d'un salon semi-privé est simulé (pas encore de système de demandes). */
-const SEMI_PRIVATE_DELAY_MS = 1600;
 /** Rafraîchit les places de la salle d'attente : les autres pilotes arrivent en vrai. */
 const LOBBY_POLL_INTERVAL_MS = 2500;
 const SCROLL_DELAY_WITH_TRANSITION_MS = 380;
@@ -86,7 +92,7 @@ type GameContextValue = GameRefs & {
   quickPlay: () => void;
   joinWithCode: (rawCode: string) => Promise<boolean>;
   joinRoom: (room: Room, area: StatusArea) => void;
-  submitRoomPassword: (password: string) => Promise<boolean>;
+  createInvitationLink: () => Promise<string | null>;
   openCreateRoom: (area: StatusArea) => void;
   submitNewRoom: (input: NewRoomInput) => Promise<boolean>;
   leaveLobby: () => void;
@@ -116,6 +122,7 @@ type GameProviderProps = {
   initialAccount: PlayerAccount | null;
   /** Retour d'une connexion Discord / GitHub qui a échoué : on rouvre l'onglet Authentification avec un message. */
   socialSignInFailed?: boolean;
+  sharedLink?: SharedLink | null;
   children: ReactNode;
 };
 
@@ -124,7 +131,7 @@ type GameProviderProps = {
  * boîtes de dialogue. Les salons vivent en base (Server Actions de `actions.ts`) ; les règles
  * pures dans `rooms.ts`. Ici, on orchestre l'interface.
  */
-export function GameProvider({ initialAccount, socialSignInFailed = false, children }: GameProviderProps) {
+export function GameProvider({ initialAccount, socialSignInFailed = false, sharedLink = null, children }: GameProviderProps) {
   const nicknameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const homeWindowRef = useRef<HTMLElement>(null);
@@ -326,7 +333,7 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
   useEffect(() => {
     if (!waitingRoomId) return;
     const timer = setInterval(async () => {
-      const result = await getRoomAction(waitingRoomId).catch(() => null);
+      const result = await roomStateAction(waitingRoomId).catch(() => null);
       if (!result?.ok) return;
       setLobby((current) => (current?.room.id === waitingRoomId ? { ...current, room: result.data } : current));
     }, LOBBY_POLL_INTERVAL_MS);
@@ -342,17 +349,8 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
   }
 
   async function tryJoin(room: Room, area: StatusArea) {
+    if (!canJoinWithCode(room)) return say(area, PRIVATE_ROOM_MESSAGE, true);
     if (isFull(room)) return say(area, `« ${room.name} » est complet.`, true);
-    if (room.visibility === "private") {
-      hush("password");
-      setDialog({ kind: "password", room, area });
-      return;
-    }
-    if (room.visibility === "semi-private") {
-      say(area, `Demande envoyée à l'hôte de « ${room.name} »… En attente de sa réponse.`);
-      setBusy(true);
-      await wait(SEMI_PRIVATE_DELAY_MS);
-    }
     const joined = await runAction(area, joinRoomAction(room.id));
     if (joined) enterLobby(joined, false);
   }
@@ -365,24 +363,41 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
       say("home", check.error, true);
       return false;
     }
-    const room = await runAction("home", getRoomAction(check.code));
+    const room = await runAction("home", findRoomByCodeAction(check.code));
     if (!room) return false;
     await tryJoin(room, "home");
     return true;
   }
 
-  async function submitRoomPassword(password: string): Promise<boolean> {
-    if (dialog?.kind !== "password") return false;
-    if (!password) {
-      say("password", "Entre le mot de passe.", true);
-      return false;
-    }
-    const joined = await runAction("password", joinRoomAction(dialog.room.id, password));
-    if (!joined) return false;
-    setDialog(null);
-    enterLobby(joined, false);
-    return true;
+  /* ---------- Invitations (salons privés) ---------- */
+
+  /** Nouveau lien à usage unique vers son salon privé, ou null en cas d'erreur (affichée dans la salle d'attente). */
+  async function createInvitationLink(): Promise<string | null> {
+    if (!lobby) return null;
+    const token = await runAction("lobby", createInviteAction(lobby.room.id));
+    return token ? invitationLink(window.location.origin, token) : null;
   }
+
+  async function redeemInvitation(token: string) {
+    if (!checkPlayer("home")) return;
+    say("home", "Ouverture de l'invitation…");
+    const joined = await runAction("home", redeemInviteAction(token));
+    if (joined) enterLobby(joined, false);
+  }
+
+  // Arrivée par un lien ou un QR code : on rejoint aussitôt, puis on retire le lien de l'adresse
+  // (une invitation ne sert qu'une fois, un rechargement ne doit pas la réessayer).
+  const sharedLinkHandled = useRef(false);
+  useEffect(() => {
+    if (!sharedLink || sharedLinkHandled.current) return;
+    sharedLinkHandled.current = true;
+    // Différé : le routeur de Next.js réécrit l'adresse à son montage, après nos effets.
+    setTimeout(() => {
+      window.history.replaceState(null, "", window.location.pathname);
+      if (sharedLink.kind === "invitation") void redeemInvitation(sharedLink.token);
+      else void joinWithCode(sharedLink.code);
+    });
+  });
 
   /* ---------- JOUER : partie rapide ---------- */
 
@@ -460,7 +475,7 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, child
     quickPlay,
     joinWithCode,
     joinRoom,
-    submitRoomPassword,
+    createInvitationLink,
     openCreateRoom,
     submitNewRoom,
     leaveLobby,

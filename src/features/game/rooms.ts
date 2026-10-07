@@ -2,13 +2,18 @@
  * Règles des salons de course. Fonctions pures : aucune dépendance à React, au DOM ni à la base,
  * utilisées à la fois par l'interface et par le serveur ; l'aléatoire est injecté.
  * Confidentialité : aucun hôte ni joueur n'est stocké, seulement le nombre de places prises.
+ *
+ * Visibilité d'un salon :
+ * - public : affiché dans la liste, n'importe qui peut entrer ;
+ * - semi-public : pas dans la liste, on entre avec le code, le lien ou le QR code ;
+ * - private : on n'entre qu'avec un lien d'invitation, valable une seule fois.
  */
 
-export const VISIBILITIES = ["public", "semi-private", "private"] as const;
+export const VISIBILITIES = ["public", "semi-public", "private"] as const;
 export type Visibility = (typeof VISIBILITIES)[number];
 export type RaceMode = "Grand Prix" | "Sprint" | "Contre-la-montre";
 
-/** Salon tel que l'interface le voit (jamais de mot de passe, même haché). */
+/** Salon tel que l'interface le voit. */
 export type Room = {
   id: string;
   name: string;
@@ -22,7 +27,7 @@ export type RandomSource = () => number;
 
 export const VISIBILITY_LABEL: Record<Visibility, string> = {
   public: "Salon public",
-  "semi-private": "Salon semi-privé",
+  "semi-public": "Salon semi-public",
   private: "Salon privé",
 };
 
@@ -31,8 +36,6 @@ export const DEFAULT_MAX_PLAYERS = 8;
 export const MIN_PLAYERS_TO_START = 2;
 export const ROOM_CODE_LENGTH = 4;
 export const ROOM_NAME_MAX_LENGTH = 28;
-export const MIN_ROOM_PASSWORD_LENGTH = 4;
-export const MAX_ROOM_PASSWORD_LENGTH = 24;
 export const MIN_NAME_LENGTH = 2;
 export const NICKNAME_MAX_LENGTH = 18;
 
@@ -79,10 +82,31 @@ export function unknownCodeMessage(code: string): string {
   return `Aucun salon ne porte le code ${code}. Vérifie-le auprès de la personne qui t'a invité.`;
 }
 
+export const PRIVATE_ROOM_MESSAGE = "Ce salon est privé : on y entre seulement avec un lien d'invitation.";
+
+/** Un salon privé ne s'ouvre pas avec son code : seulement avec une invitation. */
+export function canJoinWithCode(room: Pick<Room, "visibility">): boolean {
+  return room.visibility !== "private";
+}
+
+/* ---------- Liens à partager ---------- */
+
+export const ROOM_LINK_PARAM = "salon";
+export const INVITATION_LINK_PARAM = "invitation";
+
+/** Lien vers un salon public ou semi-public (même effet que taper son code). */
+export function roomLink(origin: string, code: string): string {
+  return `${origin}/?${ROOM_LINK_PARAM}=${encodeURIComponent(code)}`;
+}
+
+/** Lien d'invitation à usage unique vers un salon privé. */
+export function invitationLink(origin: string, token: string): string {
+  return `${origin}/?${INVITATION_LINK_PARAM}=${encodeURIComponent(token)}`;
+}
+
 export type NewRoomInput = {
   name: string;
   visibility: Visibility;
-  password: string;
   maxPlayers: number;
 };
 
@@ -93,10 +117,6 @@ export function validateNewRoom(input: NewRoomInput): string | null {
   if (name.length > ROOM_NAME_MAX_LENGTH) return `Le nom compte au plus ${ROOM_NAME_MAX_LENGTH} caractères.`;
   if (!isVisibility(input.visibility)) return "Choisis qui peut entrer.";
   if (!MAX_PLAYER_OPTIONS.includes(input.maxPlayers as (typeof MAX_PLAYER_OPTIONS)[number])) return "Nombre de places invalide.";
-  if (input.visibility === "private") {
-    if (input.password.length < MIN_ROOM_PASSWORD_LENGTH) return "Le mot de passe compte au moins 4 caractères.";
-    if (input.password.length > MAX_ROOM_PASSWORD_LENGTH) return "Le mot de passe compte au plus 24 caractères.";
-  }
   return null;
 }
 

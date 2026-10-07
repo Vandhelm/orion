@@ -1,5 +1,5 @@
-import { GameProvider, GameShell, type PlayerAccount } from "@/features/game/GameProvider";
-import { CreateRoomDialog, RoomPasswordDialog } from "@/features/game/components/GameDialogs";
+import { GameProvider, GameShell, type PlayerAccount, type SharedLink } from "@/features/game/GameProvider";
+import { CreateRoomDialog } from "@/features/game/components/GameDialogs";
 import { GameWindow } from "@/features/game/components/GameWindow";
 import { LobbyWindow } from "@/features/game/components/LobbyWindow";
 import { MobileTabs, SideTabs } from "@/features/game/components/ModeTabs";
@@ -12,12 +12,16 @@ import { Masthead } from "./Masthead";
 import "../orion.css";
 
 /** Page d'accueil O.R.I.O.N : intro, colonne journal, fenêtre de jeu, salons. */
-type OrionHomeProps = { initialAccount: PlayerAccount | null; socialSignInFailed: boolean };
+type OrionHomeProps = {
+  initialAccount: PlayerAccount | null;
+  socialSignInFailed: boolean;
+  sharedLink: SharedLink | null;
+};
 
-export function OrionHome({ initialAccount, socialSignInFailed }: OrionHomeProps) {
+export function OrionHome({ initialAccount, socialSignInFailed, sharedLink }: OrionHomeProps) {
   return (
     <ReplayProvider>
-      <GameProvider initialAccount={initialAccount} socialSignInFailed={socialSignInFailed}>
+      <GameProvider initialAccount={initialAccount} socialSignInFailed={socialSignInFailed} sharedLink={sharedLink}>
         <GameShell>
           <Intro />
           <div className="scene">
@@ -53,7 +57,6 @@ export function OrionHome({ initialAccount, socialSignInFailed }: OrionHomeProps
           </div>
           <RoomsPage />
           <CreateRoomDialog />
-          <RoomPasswordDialog />
         </GameShell>
       </GameProvider>
     </ReplayProvider>

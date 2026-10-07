@@ -44,6 +44,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="fr"
+      // La page d'accueil défile en douceur (orion.css) ; Next.js le coupe pendant les changements de page.
+      data-scroll-behavior="smooth"
       className={`${silkscreen.variable} ${vt323.variable} ${kronaOne.variable} ${spaceMono.variable} ${notoSansJp.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

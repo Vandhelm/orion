@@ -1,5 +1,5 @@
 {
-  "id": "c6a6c84b-a8ed-4283-8894-b945c19a9b2d",
+  "id": "404f0208-049e-49b6-a7c6-f25db825298e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -47,12 +47,6 @@
           "notNull": true,
           "default": "'Grand Prix'"
         },
-        "password_hash": {
-          "name": "password_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -70,12 +64,76 @@
         "room_players_range": {
           "name": "room_players_range",
           "value": "\"room\".\"players\" >= 0 AND \"room\".\"players\" <= \"room\".\"max_players\""
-        },
-        "room_password_only_private": {
-          "name": "room_password_only_private",
-          "value": "(\"room\".\"visibility\" = 'private') = (\"room\".\"password_hash\" IS NOT NULL)"
         }
       },
+      "isRLSEnabled": false
+    },
+    "public.room_invite": {
+      "name": "room_invite",
+      "schema": "",
+      "columns": {
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "room_id": {
+          "name": "room_id",
+          "type": "varchar(6)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "room_invite_room_id_idx": {
+          "name": "room_invite_room_id_idx",
+          "columns": [
+            {
+              "expression": "room_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "room_invite_room_id_room_id_fk": {
+          "name": "room_invite_room_id_room_id_fk",
+          "tableFrom": "room_invite",
+          "tableTo": "room",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
@@ -85,7 +143,7 @@
       "schema": "public",
       "values": [
         "public",
-        "semi-private",
+        "semi-public",
         "private"
       ]
     }

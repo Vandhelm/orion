@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useGame } from "../GameProvider";
 import { CreatureSvg } from "../creatures";
 import { MIN_PLAYERS_TO_START, VISIBILITY_LABEL, type Room } from "../rooms";
+import { SharePanel } from "./SharePanel";
 import { StatusMessage } from "./StatusMessage";
 import { WindowBar } from "./WindowBar";
 
@@ -46,19 +47,22 @@ export function LobbyWindow() {
               {room && `${VISIBILITY_LABEL[room.visibility]} · ${room.mode}${host ? " · tu es l'hôte" : ""}`}
             </div>
           </div>
-          <div className="lcode">
-            <span>CODE</span>
-            <b>{room?.id}</b>
-            <button className="mini" type="button" onClick={copyLobbyCode}>
-              COPIER
-            </button>
-          </div>
+          {room && room.visibility !== "private" && (
+            <div className="lcode">
+              <span>CODE</span>
+              <b>{room.id}</b>
+              <button className="mini" type="button" onClick={copyLobbyCode}>
+                COPIER
+              </button>
+            </div>
+          )}
         </div>
         <div className="field">
           <span style={{ fontSize: 20 }}>Places :</span>{" "}
           <span style={{ fontSize: 20 }}>{room && `${room.players} / ${room.maxPlayers} prises`}</span>
         </div>
-        {room && <Seats key={room.id} room={room} host={host} />}
+        {room && <Seats key={`seats-${room.id}`} room={room} host={host} />}
+        {room && <SharePanel key={`share-${room.id}`} room={room} />}
         <p className="lnote">Les autres pilotes restent anonymes : seul le nombre de places prises est affiché.</p>
         <div className="me">
           <span className="meav">
