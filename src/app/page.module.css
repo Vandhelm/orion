@@ -43,13 +43,6 @@
   padding: 0 10px;
 }
 
-.stripes {
-  background-color: var(--color-background);
-  background-image: repeating-linear-gradient(180deg, var(--color-border) 0 2px, transparent 2px 4px);
-  background-clip: content-box;
-  padding: 7px 0;
-}
-
 .content {
   flex: 1;
   display: grid;
@@ -90,14 +83,8 @@
   transition: transform 0.2s;
 }
 
+/* Apparition de la carte de connexion (son visuel est dans AuthForm.module.css). */
 .login {
-  position: relative;
-  width: min(344px, 100%);
-  background: var(--color-background);
-  border: 2px solid var(--color-border);
-  box-shadow: var(--shadow-hard);
-  display: flex;
-  flex-direction: column;
   opacity: 0;
   animation: pop 0.45s steps(5, end) 1.6s both;
 }
@@ -151,16 +138,6 @@
     opacity: 1;
     transform: none;
   }
-}
-
-.fieldInput:focus {
-  box-shadow: 3px 3px 0 var(--color-focus);
-}
-
-.submit {
-  box-shadow:
-    0 0 0 3px var(--color-background),
-    0 0 0 5px var(--color-border);
 }
 
 @media (prefers-reduced-motion: reduce) {

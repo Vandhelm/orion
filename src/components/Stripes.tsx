@@ -1,4 +1,4 @@
-import styles from "../page.module.css";
+import styles from "./Stripes.module.css";
 
 /** Séparateur décoratif à hachures, utilisé de chaque côté des titres de fenêtre. */
 export function Stripes() {

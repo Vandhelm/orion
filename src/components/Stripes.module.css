@@ -1,0 +1,6 @@
+.stripes {
+  background-color: var(--color-background);
+  background-image: repeating-linear-gradient(180deg, var(--color-border) 0 2px, transparent 2px 4px);
+  background-clip: content-box;
+  padding: 7px 0;
+}

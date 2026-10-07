@@ -16,9 +16,9 @@ export function SignOutButton() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="min-h-11 rounded-md border border-border px-4 focus-visible:outline-2 focus-visible:outline-foreground"
+      className="min-h-[46px] cursor-pointer rounded-[10px] border-2 border-border bg-background px-4 font-sans text-[14px] tracking-[0.06em] hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
-      Se déconnecter
+      SE DÉCONNECTER
     </button>
   );
 }

@@ -1,11 +1,11 @@
 import { Clock } from "./_components/Clock";
 import { FishIllustration } from "./_components/FishIllustration";
 import { LoginCard } from "./_components/LoginCard";
-import { Logo } from "./_components/Logo";
+import { Logo } from "@/components/Logo";
 import { ReplayButton } from "./_components/ReplayButton";
 import { ReplayProvider } from "./_components/replay-context";
 import { StageSection } from "./_components/StageSection";
-import { Stripes } from "./_components/Stripes";
+import { Stripes } from "@/components/Stripes";
 import { TitleSvg } from "./_components/TitleSvg";
 import styles from "./page.module.css";
 
