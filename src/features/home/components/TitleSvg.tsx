@@ -34,9 +34,9 @@ const LETTERS = [
 
 const SERIF_NOTCHES_X = [154, 296, 438, 580];
 
-export function TitleSvg() {
+export function TitleSvg({ className }: { className?: string }) {
   return (
-    <svg className="block w-full h-auto overflow-visible" viewBox="0 95 770 250" preserveAspectRatio="xMidYMid meet" role="img" aria-label="O.R.I.O.N">
+    <svg className={className} viewBox="0 95 770 250" preserveAspectRatio="xMidYMid meet" role="img" aria-label="O.R.I.O.N">
       <defs>
         <pattern id="txS" width="6" height="6" patternUnits="userSpaceOnUse">
           <rect width="6" height="6" className="fill-background" />

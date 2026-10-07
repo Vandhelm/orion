@@ -28,5 +28,5 @@ export function Clock() {
     };
   }, []);
 
-  return <span className="ml-auto">{time}</span>;
+  return <span>{time}</span>;
 }

@@ -7,18 +7,37 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ───────────── 1. Palette : nom → hexadécimal (seul endroit où un hexadécimal apparaît) ───────────── */
-/* Couleurs extraites de la maquette orion.html. */
+/* Couleurs extraites de la maquette orion.html (quasi-doublons fusionnés : #141414 et #000 → neutral-950, #f1f1f1 → neutral-100, #777 et #888 → neutral-500). */
 @theme {
-  --color-neutral-950: #121212; /* encre : texte, bordures, ombres (le #000 de la maquette y est fusionné) */
   --color-white: #FFFFFF;       /* papier */
-  --color-lime-300: #D4F53C;    /* surlignage : survol des liens, message de confirmation */
-  --color-cyan-400: #3FD8FF;    /* focus des champs, illustration */
-  --color-pink-500: #FF3AA0;    /* accent : bouton actif, ombre du titre, illustration */
-  --color-orange-500: #FF6A1A;  /* illustration */
-  --color-neutral-400: #a3a3a3; /* texte secondaire (sombre) */
-  --color-neutral-500: #737373; /* texte secondaire (clair) */
-  --color-red-400: #f87171;     /* erreurs (sombre) */
-  --color-red-600: #dc2626;     /* erreurs (clair) */
+  --color-neutral-100: #F2F2F2; /* survol des cases de salon */
+  --color-neutral-200: #DDDDDD;
+  --color-neutral-300: #BDBDBD; /* cartes « à venir » */
+  --color-neutral-500: #737373;
+  --color-neutral-600: #555555;
+  --color-neutral-700: #444444;
+  --color-neutral-800: #333333;
+  --color-neutral-950: #121212; /* encre : texte, bordures, ombres */
+
+  --color-red-50: #FFF0F0;
+  --color-red-100: #FCE9E6;
+  --color-red-600: #E3262B;     /* rouge de la marque : bloc de jeu, bouton JOUER, accent */
+  --color-orange-500: #FF6A1A;  /* « en ligne », illustration */
+  --color-yellow-100: #FFF7B0;
+  --color-yellow-300: #FFE600;
+  --color-lime-300: #D4F53C;    /* survol des liens */
+  --color-lime-400: #9CFF2E;
+  --color-cyan-50: #E9FBFF;
+  --color-cyan-400: #3FD8FF;    /* illustration, avatars */
+  --color-sky-400: #00D1FF;
+  --color-blue-100: #DFE3FA;
+  --color-blue-300: #8B98E6;
+  --color-blue-600: #4A5CC9;
+  --color-blue-700: #3346B8;
+  --color-blue-900: #1B2A8C;    /* bleu foncé : onglets latéraux, bulles */
+  --color-indigo-700: #2B1FD6;  /* poisson du soleil */
+  --color-pink-200: #FFC3E1;
+  --color-pink-500: #FF2E88;
 }
 
 /* ───────────── 2. Tokens sémantiques (les seuls à utiliser dans les composants) ───────────── */
@@ -27,48 +46,26 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-danger: var(--danger);
-
   --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-highlight: var(--highlight);
-  --color-highlight-foreground: var(--highlight-foreground);
-  --color-focus: var(--focus);
 
   --color-illustration-1: var(--illustration-1);
   --color-illustration-2: var(--illustration-2);
   --color-illustration-3: var(--illustration-3);
-
-  /* Ombres pleines décalées, signature visuelle de la maquette : shadow-hard-sm / shadow-hard / shadow-hard-lg */
-  --shadow-hard-sm: 3px 3px 0 var(--border);
-  --shadow-hard: 6px 6px 0 var(--border);
-  --shadow-hard-lg: 8px 8px 0 var(--border);
 
   --font-sans: var(--font-silkscreen);
   --font-mono: var(--font-vt323);
 }
 
 /* ───────────── 3. Thèmes ───────────── */
-/*
- * Contraste (WCAG) : les couleurs vives (lime, cyan, rose, orange) sont illisibles sous du texte blanc
- * (1,2 à 3,3:1). Leur texte est donc toujours l'encre, dans les deux thèmes (*-foreground).
- */
+/* La page d'accueil (maquette) fige le thème clair dans orion.css ; les autres pages suivent ces thèmes. */
 :root {
   --background: var(--color-white);
   --foreground: var(--color-neutral-950);
   --border: var(--color-neutral-950);
-  --muted: var(--color-neutral-500);
-  --danger: var(--color-red-600);
-
-  --accent: var(--color-pink-500);
-  --accent-foreground: var(--color-neutral-950);
-  --highlight: var(--color-lime-300);
-  --highlight-foreground: var(--color-neutral-950);
-  --focus: var(--color-cyan-400);
+  --accent: var(--color-red-600);
 
   --illustration-1: var(--color-cyan-400);
-  --illustration-2: var(--color-pink-500);
+  --illustration-2: var(--color-red-600);
   --illustration-3: var(--color-orange-500);
 }
 
@@ -77,8 +74,6 @@
   --background: var(--color-neutral-950);
   --foreground: var(--color-white);
   --border: var(--color-white);
-  --muted: var(--color-neutral-400);
-  --danger: var(--color-red-400);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -86,8 +81,6 @@
     --background: var(--color-neutral-950);
     --foreground: var(--color-white);
     --border: var(--color-white);
-    --muted: var(--color-neutral-400);
-    --danger: var(--color-red-400);
   }
 }
 

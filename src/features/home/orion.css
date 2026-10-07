@@ -1,0 +1,683 @@
+/*
+ * Maquette O.R.I.O.N (orion.html) portée telle quelle : mise en page, animations, View Transitions.
+ * Généré depuis la maquette puis nettoyé : couleurs → palette de globals.css, polices → next/font,
+ * sélecteurs limités à la racine .orion (page d'accueil seulement), règles mortes retirées.
+ * Les règles se superposent par « couches » successives de la maquette : l'ordre compte.
+ */
+
+/* La maquette n'existe qu'en thème clair : on fige les tokens dans la page d'accueil. */
+.orion {
+  color-scheme: light;
+  --background: var(--color-white);
+  --foreground: var(--color-neutral-950);
+  --border: var(--color-neutral-950);
+  min-height: 100%;
+  flex: 1;
+}
+
+.orion { --ink:var(--color-neutral-950);--paper:var(--color-white);--cyan:var(--color-cyan-400);--magenta:var(--color-red-600);--orange:var(--color-orange-500) }
+.orion [hidden] { display:none !important }
+.orion .login { width:380px }
+.orion .wbar { height:30px;border-bottom:2px solid var(--color-neutral-950);display:flex;align-items:center;gap:8px;padding:0 8px;flex:none }
+.orion .wtitle { margin:0;font-family:var(--font-silkscreen),monospace;font-weight:400;font-size:13px;padding:0 8px;white-space:nowrap }
+.orion .wbody { padding:20px 24px 24px;display:flex;flex-direction:column;gap:16px }
+.orion .cbtn { padding:0;cursor:pointer }
+.orion .cbtn:hover { background:var(--color-neutral-950) }
+.orion .login[hidden] { display:none !important }
+.orion .avatar { padding:0;cursor:pointer }
+.orion .avatar:hover { outline:2px solid var(--color-neutral-950);outline-offset:2px }
+.orion .avatar svg { width:60px;height:60px }
+.orion .status { margin:0;font-size:19px;line-height:1.15;border:2px solid var(--color-neutral-950);padding:6px 10px;background:var(--color-white) }
+.orion .status.err { background:var(--color-neutral-950);color:var(--color-white) }
+.orion .status.err::before { content:"! ";color:var(--color-red-600) }
+.orion .field input[aria-invalid=true] { box-shadow:3px 3px 0 var(--color-red-600) }
+.orion .sr { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0) }
+.orion .input { font-family:var(--font-vt323),monospace;font-size:22px;color:var(--color-neutral-950);background:var(--color-white);border:2px solid var(--color-neutral-950);padding:6px 10px;outline:none;min-width:0 }
+.orion .input:focus { box-shadow:3px 3px 0 var(--color-cyan-400) }
+.orion .sel { padding:4px 8px }
+.orion .rtools { display:flex;gap:10px }
+.orion .rtools .input { flex:1 }
+.orion .pips { display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;max-width:210px }
+.orion .pips i, .orion .seats i { width:10px;height:10px;border:2px solid var(--color-neutral-950);background:var(--color-white) }
+.orion .pips i.on, .orion .seats i.on { background:var(--color-neutral-950) }
+.orion .seats { display:flex;flex-wrap:wrap;gap:6px;margin-top:-8px }
+.orion .seats i { width:22px;height:22px }
+.orion .seats i.me { background:var(--color-cyan-400) }
+.orion .wfoot { display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap }
+.orion .mini { min-height:36px }
+.orion .mini:disabled { opacity:.4;cursor:not-allowed;box-shadow:none }
+.orion .submit.small { min-height:40px;padding:0 22px;font-size:13px }
+.orion .submit:disabled { opacity:.45;cursor:not-allowed }
+.orion .submit:disabled:hover { background:var(--color-neutral-950);color:var(--color-white) }
+.orion .lhead { display:flex;justify-content:space-between;gap:12px;align-items:flex-start }
+.orion .lname { font-family:var(--font-silkscreen),monospace;font-size:18px;line-height:1.15;word-break:break-word }
+.orion .lvis { font-size:18px;margin-top:4px }
+.orion .lcode { display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:15px }
+.orion .lcode b { font-family:var(--font-silkscreen),monospace;font-size:22px;letter-spacing:.12em;background:var(--color-neutral-950);color:var(--color-white);padding:2px 8px }
+.orion .lnote { margin:0;font-size:17px;color:var(--color-neutral-700);line-height:1.1 }
+.orion .me { display:flex;align-items:center;gap:10px;font-size:20px }
+.orion .meav { width:40px;height:40px;border:2px solid var(--color-neutral-950);display:grid;place-items:center;background:var(--color-white) }
+.orion .meav svg { width:32px;height:32px }
+.orion .mdlg { padding:0;border:2px solid var(--color-neutral-950);box-shadow:6px 6px 0 var(--color-neutral-950);background:var(--color-white);color:var(--color-neutral-950);width:min(400px,calc(100vw - 32px));font-family:var(--font-vt323),monospace }
+.orion .mdlg::backdrop { background-color:color-mix(in srgb, var(--color-white) 60%, transparent);background-image:radial-gradient(var(--color-neutral-950) 1px,transparent 1.4px);background-size:5px 5px }
+.orion .mdlg form { display:flex;flex-direction:column }
+.orion .vis { border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:6px }
+.orion .vis legend { padding:0;margin-bottom:6px }
+.orion .vopt { display:flex;gap:10px;align-items:flex-start;border:2px solid var(--color-neutral-950);padding:6px 10px;cursor:pointer;font-size:18px;line-height:1.1 }
+.orion .vopt b { display:block;font-family:var(--font-silkscreen),monospace;font-weight:400;font-size:13px;margin-bottom:2px }
+.orion .vopt input { accent-color:var(--color-neutral-950);margin-top:3px }
+.orion .vopt:has(input:checked) { box-shadow:4px 4px 0 var(--color-neutral-950) }
+@media (max-width:719px) {
+  .orion .lhead { flex-direction:column }
+  .orion .lcode { align-items:flex-start }
+}
+.orion .login .who { display:flex;gap:14px;align-items:center }
+.orion .avatar { width:76px;height:76px;flex:none;border:2px solid var(--color-neutral-950);background:var(--color-white);background-image:radial-gradient(var(--color-neutral-950) 1.2px,transparent 1.6px);background-size:6px 6px;display:grid;place-items:center }
+.orion .avatar svg { width:60px;height:auto }
+.orion .linkbtn { text-align:left;font-family:var(--font-vt323),monospace;font-size:18px;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;color:var(--color-neutral-950);align-self:flex-start }
+.orion .linkbtn:hover { background:var(--color-neutral-950);color:var(--color-white) }
+.orion .submit.main { background:var(--color-neutral-950);color:var(--color-white);font-size:16px;min-height:52px }
+.orion .submit.main:hover { background:var(--color-red-600);color:var(--color-neutral-950) }
+.orion .acts { display:flex;flex-direction:column;gap:14px;padding-top:4px }
+.orion .sep { border:0;border-top:2px dashed var(--color-neutral-950);margin:4px 0 0 }
+.orion .coderow { display:flex;gap:10px }
+.orion .coderow input { text-transform:uppercase;letter-spacing:.2em }
+.orion .mini { font-family:var(--font-silkscreen),monospace;font-size:12px;background:var(--color-white);border:2px solid var(--color-neutral-950);padding:0 14px;cursor:pointer;box-shadow:3px 3px 0 var(--color-neutral-950);white-space:nowrap }
+.orion .mini:hover { background:var(--color-neutral-950);color:var(--color-white) }
+.orion .mini:active { transform:translate(2px,2px);box-shadow:1px 1px 0 var(--color-neutral-950) }
+.orion .stage { height:auto;min-height:700px }
+@media (max-width:719px) {
+  .orion .stage { height:auto;min-height:640px }
+  .orion .login { width:100% }
+}
+.orion .intro { position:fixed;inset:0;z-index:50;overflow:hidden;pointer-events:none;background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center }
+.orion .intro.go { animation:introBg .7s cubic-bezier(.4,0,.2,1) 1.45s both,introOut 1ms linear 2.2s both }
+.orion .burst { position:absolute;left:50%;top:50%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;opacity:0 }
+.orion .intro.go .burst { animation:burstIn .6s ease-out .05s both,burstSpin 1.8s linear .05s both,burstOut .6s ease-in-out 1.2s forwards }
+.orion .stage-i { position:relative;flex:none;width:min(720px,100vw,74vh);aspect-ratio:800/760 }
+.orion .intro.go .stage-i { animation:push 1.3s cubic-bezier(.2,.7,.2,1) both }
+.orion .stage-i svg { position:absolute;inset:0;width:100%;height:100%;overflow:visible }
+.orion .glints line { stroke-dasharray:280 2400;stroke-dashoffset:280;opacity:0 }
+.orion .intro.go .glints line { animation:glint .65s cubic-bezier(.45,0,.2,1) both }
+.orion .spark { transform-box:fill-box;transform-origin:center;transform:scale(0) }
+.orion .intro.go .spark { animation:twinkle .55s ease-in-out both }
+.orion .intro .band { animation-duration:1s;animation-fill-mode:both;will-change:transform }
+.orion .intro.go .band.l { animation-name:slideL }
+.orion .intro.go .band.r { animation-name:slideR }
+.orion .streaks { position:absolute;inset:0;pointer-events:none }
+.orion .streaks i { position:absolute;height:2px;background:var(--ink);opacity:0 }
+.orion .intro.go .streaks i { animation:streak .5s cubic-bezier(.2,.7,.3,1) both }
+.orion .intro .title-i { position:relative;width:min(560px,86vw);margin:-6vh 0 0;line-height:0;
+  -webkit-mask-image:linear-gradient(100deg,var(--color-neutral-950) 40%,transparent 60%);mask-image:linear-gradient(100deg,var(--color-neutral-950) 40%,transparent 60%);
+  -webkit-mask-size:300% 100%;mask-size:300% 100%;-webkit-mask-position:100% 0;mask-position:100% 0 }
+.orion .intro.go .title-i { animation:sweep .7s cubic-bezier(.3,.6,.2,1) .25s both,titleOut .45s cubic-bezier(.4,0,.6,1) 1.05s forwards }
+.orion .intro .title-i svg { width:100%;height:auto;display:block }
+.orion .intro .title-i::after { content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 42%,color-mix(in srgb, var(--color-white) 95%, transparent) 50%,transparent 58%);background-size:300% 100%;background-position:100% 0;mix-blend-mode:normal }
+.orion .intro.go .title-i::after { animation:shine .9s cubic-bezier(.3,.6,.2,1) .45s both }
+@keyframes push {from{transform:scale(1.08)}to{transform:none}}
+@keyframes burstIn {from{opacity:0}to{opacity:1}}
+@keyframes burstSpin {from{transform:rotate(-2deg) scale(1.06)}to{transform:rotate(2deg) scale(1)}}
+@keyframes burstOut {from{opacity:1}to{opacity:0}}
+@keyframes glint {0%{opacity:0;stroke-dashoffset:280}15%{opacity:1}85%{opacity:1}100%{opacity:0;stroke-dashoffset:-1500}}
+@keyframes twinkle {0%{transform:scale(0) rotate(0)}50%{transform:scale(1) rotate(45deg)}100%{transform:scale(0) rotate(90deg)}}
+@keyframes slideL {0%{transform:translateX(0);animation-timing-function:cubic-bezier(.3,0,.5,1)}
+  22%{transform:translateX(16px);animation-timing-function:cubic-bezier(.6,0,.15,1)}100%{transform:translateX(-1700px)}}
+@keyframes slideR {0%{transform:translateX(0);animation-timing-function:cubic-bezier(.3,0,.5,1)}
+  22%{transform:translateX(-16px);animation-timing-function:cubic-bezier(.6,0,.15,1)}100%{transform:translateX(1700px)}}
+@keyframes streak {0%{opacity:0;transform:translateX(0) scaleX(.2)}30%{opacity:.85}100%{opacity:0;transform:translateX(var(--dx)) scaleX(1)}}
+@keyframes sweep {to{-webkit-mask-position:0 0;mask-position:0 0}}
+@keyframes shine {from{background-position:100% 0}to{background-position:0 0}}
+@keyframes titleOut {to{opacity:0;transform:translateY(-10px)}}
+@keyframes introBg {to{background-color:color-mix(in srgb, var(--color-white) 0%, transparent)}}
+@keyframes introOut {from{opacity:1}to{opacity:0}}
+.orion .intro:not(.go), .orion .intro:not(.go) * { animation:none !important }
+.orion .reveal { opacity:0;animation-duration:.75s;animation-timing-function:cubic-bezier(.2,.8,.2,1);animation-fill-mode:both;will-change:transform,opacity }
+.orion .reveal.go { animation-name:rise }
+@keyframes rise {from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes cardIn {from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
+.orion a { color:var(--color-neutral-950) }
+.orion a:hover { color:var(--color-neutral-950);background:var(--color-lime-300) }
+.orion .stripes { background-color:var(--color-white);background-image:repeating-linear-gradient(180deg,var(--color-neutral-950) 0 2px,transparent 2px 4px);background-clip:content-box;padding:7px 0 }
+.orion .field input { font-family:var(--font-vt323),monospace;font-size:22px;color:var(--color-neutral-950);background:var(--color-white);border:2px solid var(--color-neutral-950);padding:6px 10px;outline:none;width:100%;box-sizing:border-box }
+.orion .field input:focus { box-shadow:3px 3px 0 var(--color-cyan-400) }
+.orion .submit { font-family:var(--font-silkscreen),monospace;font-size:14px;letter-spacing:.06em;background:var(--color-white);color:var(--color-neutral-950);border:2px solid var(--color-neutral-950);border-radius:10px;min-height:46px;cursor:pointer;box-shadow:0 0 0 3px var(--color-white),0 0 0 5px var(--color-neutral-950) }
+.orion .submit:hover { background:var(--color-neutral-950);color:var(--color-white) }
+.orion .submit:active { background:var(--color-red-600);color:var(--color-neutral-950) }
+.orion .replay { font-family:var(--font-vt323),monospace;font-size:18px;background:var(--color-white);color:var(--color-neutral-950);border:2px solid var(--color-neutral-950);border-radius:6px;min-height:34px;padding:0 12px;cursor:pointer;box-shadow:3px 3px 0 var(--color-neutral-950) }
+.orion .replay:hover { background:var(--color-neutral-950);color:var(--color-white) }
+.orion .replay { white-space:nowrap }
+.orion .closebox { width:16px;height:16px;border:2px solid var(--color-neutral-950);background:var(--color-white);box-sizing:border-box;flex:none }
+.orion * { box-sizing:border-box }
+html:has(.orion), .orion { margin:0;background:var(--color-white);color:var(--color-neutral-950);font-family:var(--font-vt323),monospace }
+.orion .stage { position:relative;height:640px;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;padding:24px;overflow:hidden }
+.orion .login { position:relative;width:344px;max-width:100%;background:var(--color-white);border:2px solid var(--color-neutral-950);box-shadow:6px 6px 0 var(--color-neutral-950);display:flex;flex-direction:column }
+.orion .title-svg { display:block;width:560px;max-width:100%;height:auto;overflow:visible }
+.orion .tagline { display:none;font-size:24px;line-height:1.15;width:560px }
+@media (max-width:719px) {
+  .orion .stage { height:auto;min-height:560px;padding:20px 12px }
+  .orion .title-svg { width:300px }
+}
+@media (prefers-reduced-motion:reduce) {
+  .orion .intro, .orion .intro *, .orion .intro .title-i::after, .orion .reveal { animation-duration:1ms !important;animation-delay:0s !important }
+}
+.orion { background-color:var(--color-white);background-image:radial-gradient(color-mix(in srgb, var(--color-red-600) 38%, transparent) 2.2px,transparent 2.7px);background-size:34px 34px;background-position:17px 17px }
+.orion .scene { position:relative;padding:40px 24px 80px }
+.orion .backband { position:absolute;left:0;right:0;top:560px;height:500px;z-index:0;border-top:5px solid var(--color-neutral-950);border-bottom:5px solid var(--color-neutral-950);overflow:hidden;background:var(--color-red-600) }
+.orion .backband svg { position:absolute;inset:0;width:100%;height:100% }
+.orion .grid { position:relative;z-index:1;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 600px minmax(0,.35fr);align-items:start }
+.orion .col { grid-column:2;position:relative;border:10px solid var(--color-neutral-950);background:var(--color-white);padding:10px;box-shadow:12px 12px 0 color-mix(in srgb, var(--color-neutral-950) 18%, transparent) }
+.orion .notes { grid-column:1;position:relative;height:100% }
+.orion .vlabel { position:absolute;left:12%;top:420px;width:84px;padding:22px 0;border:3px solid var(--color-neutral-950);display:flex;justify-content:center;
+  background:linear-gradient(180deg,var(--color-red-600) 0%,var(--color-pink-200) 70%,var(--color-white) 100%);box-shadow:6px 6px 0 var(--color-neutral-950) }
+.orion .vlabel span { writing-mode:vertical-rl;font-size:56px;line-height:1;color:var(--color-neutral-950);letter-spacing:.06em;font-family:'Hiragino Sans',var(--font-noto-jp),'Yu Gothic',sans-serif;font-weight:300;-webkit-text-stroke:.5px var(--color-white) }
+.orion .vlabel small { position:absolute;bottom:-34px;left:-3px;right:-3px;text-align:center;font-size:15px;letter-spacing:.2em;background:var(--color-neutral-950);color:var(--color-white);padding:2px 0 }
+@media (max-width:1099px) {
+  .orion .grid { grid-template-columns:minmax(0,1fr);max-width:640px }
+  .orion .col, .orion .notes { grid-column:1 }
+  .orion .notes { display:none }
+  .orion .backband { top:520px;height:440px }
+}
+@media (max-width:719px) {
+  .orion .scene { padding:16px 8px 48px }
+  .orion .col { border-width:6px;padding:6px;box-shadow:none }
+  .orion .backband { top:420px;height:380px }
+  .orion { background-size:26px 26px }
+}
+.orion { --red:var(--color-red-600);--blue:var(--color-neutral-950);--blush:var(--color-white);--slate:var(--color-neutral-950) }
+html:has(.orion), .orion { background:var(--blush) !important;color:var(--blue) }
+.orion { font-family:var(--font-space-mono),'IBM Plex Mono',monospace;background-color:var(--blush) !important;
+  background-image:radial-gradient(color-mix(in srgb, var(--color-red-600) 38%, transparent) 2.2px,transparent 2.7px) !important;background-size:30px 30px !important;background-position:15px 15px !important }
+.orion .intro { background-color:var(--blush) }
+.orion .scene { position:relative;padding:48px 24px 90px }
+.orion .backband { position:absolute;left:0;right:0;top:820px;height:520px;z-index:0;border-top:6px solid var(--slate);border-bottom:6px solid var(--slate);overflow:hidden;background:var(--blush) }
+.orion .backband svg { position:absolute;inset:0;width:100%;height:100% }
+.orion .grid { position:relative;z-index:1;max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 560px minmax(0,.18fr);align-items:start }
+.orion .col { grid-column:2;border:12px solid var(--blue);background:var(--blush);padding:0;box-shadow:none }
+.orion .paper { display:block }
+.orion .notes { grid-column:1;position:relative;align-self:stretch }
+.orion .vlabel { position:absolute;left:12%;top:420px;width:84px;padding:22px 0;border:3px solid var(--color-neutral-950);display:flex;justify-content:center;
+  background:linear-gradient(180deg,var(--color-red-600) 0%,var(--color-pink-200) 70%,var(--color-white) 100%);box-shadow:6px 6px 0 var(--color-neutral-950) }
+.orion .vlabel span { writing-mode:vertical-rl;font-size:56px;line-height:1;color:var(--color-neutral-950);letter-spacing:.06em;font-family:'Hiragino Sans',var(--font-noto-jp),'Yu Gothic',sans-serif;font-weight:300;-webkit-text-stroke:.5px var(--color-white) }
+.orion .vlabel small { position:absolute;bottom:-34px;left:-3px;right:-3px;text-align:center;font-size:11px;letter-spacing:.08em;background:var(--color-neutral-950);color:var(--color-white);padding:3px 0;font-family:var(--font-space-mono),monospace;white-space:nowrap }
+.orion .mast { display:grid;grid-template-columns:62px 1fr 104px;border-bottom:2px solid var(--blue);margin:10px 10px 0;border-top:2px solid var(--blue);border-left:2px solid var(--blue);border-right:2px solid var(--blue) }
+.orion .mlogo { display:grid;place-items:center;border-right:2px solid var(--blue) }
+.orion .mlogo svg { width:40px }
+.orion .brand { margin:0;text-align:center;font-family:var(--font-krona-one),'Archivo Black',sans-serif;font-weight:400;color:var(--red);font-size:32px;letter-spacing:.02em;padding:12px 6px 8px;line-height:1 }
+.orion .minfo { margin:0;border-left:2px solid var(--blue);font-size:7.5px;line-height:1.35;padding:6px;text-align:right;color:var(--blue);letter-spacing:.04em }
+.orion .minfo b { font-weight:700 }
+.orion .rule { display:flex;margin:0 10px;border:2px solid var(--blue);border-top:0;font-size:9px }
+.orion .rule span, .orion .rule .replay { flex:1;text-align:center;padding:3px 2px;border-right:2px solid var(--blue);color:var(--blue) }
+.orion .rule .replay { font-family:inherit;font-size:9px;background:none;border:0;box-shadow:none;border-radius:0;min-height:0;cursor:pointer;flex:1.4;white-space:nowrap }
+.orion .rule .replay:hover { background:var(--blue);color:var(--blush) }
+.orion .hero { display:grid;grid-template-columns:1fr 1.05fr;align-items:center;margin:0 10px;border:2px solid var(--blue);border-top:0;padding:26px 12px 30px;gap:6px;min-height:290px }
+.orion .hart { position:relative;aspect-ratio:1 }
+.orion .disc { position:absolute;inset:6% 12% 10% 2%;border-radius:50%;background:var(--blue) }
+.orion .disc::after { content:"";position:absolute;left:18%;right:18%;bottom:-8%;height:8%;background:var(--blue);border-radius:50% 50% 0 0/100% 100% 0 0 }
+.orion .lfish { position:absolute;left:-6%;top:22%;width:112%;height:auto;transform:rotate(-10deg) }
+.orion .htxt { text-align:right }
+.orion .big { margin:0;font-family:var(--font-krona-one),'Archivo Black',sans-serif;color:var(--red);font-size:25px;line-height:1.35;letter-spacing:.01em }
+.orion .big span { display:inline-block }
+.orion .redblock { margin:14px 10px 0;background:var(--red);border:2px solid var(--blue);padding:30px 22px 34px;color:var(--blush) }
+.orion .lead { margin:0 auto 24px;max-width:38ch;text-align:center;font-size:10px;line-height:1.55;font-weight:700;color:var(--color-white) }
+.orion .redblock .stage { height:auto !important;min-height:0 !important;padding:0;display:flex;justify-content:center;overflow:visible;border:0 }
+.orion .sun { position:relative;height:330px;margin:0;overflow:hidden;background:repeating-conic-gradient(from 3deg at 50% 50%,var(--red) 0 9deg,var(--blush) 9deg 22.5deg) }
+.orion .bcircle { position:absolute;left:50%;top:50%;width:230px;height:230px;margin:-115px 0 0 -115px;border-radius:50%;background:var(--blush);border:9px solid var(--color-neutral-950);overflow:hidden;
+  background-image:repeating-radial-gradient(circle at 50% 50%,transparent 0 9px,color-mix(in srgb, var(--color-red-600) 90%, transparent) 9px 11px) }
+.orion .lfish.big { left:-4%;top:20%;width:108%;transform:rotate(-24deg) }
+.orion .tagline { margin:26px auto 30px;max-width:44ch;text-align:center;color:var(--red);font-size:9.5px;line-height:1.5 }
+.orion .how { padding:0 10px 10px }
+.orion .sec { margin:0 0 12px;font-family:var(--font-krona-one),sans-serif;font-weight:400;color:var(--red);font-size:15px;letter-spacing:.02em }
+.orion .cards { list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px }
+.orion .cards li { display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;color:var(--blue) }
+.orion .cards li svg { width:100%;aspect-ratio:1;padding:20%;border:1.5px solid var(--red);box-sizing:border-box;color:var(--blue);background:var(--blush) }
+.orion .cards li.on svg { background:var(--blue);color:var(--blush);border-color:var(--blue) }
+.orion .cards b { font-family:var(--font-krona-one),sans-serif;font-weight:400;font-size:9px;letter-spacing:.04em;text-transform:uppercase;margin-top:6px;color:var(--blue) }
+.orion .cards li.on b { color:var(--red) }
+.orion .cards span { font-size:8.5px;color:var(--blue) }
+.orion .pfoot { margin:22px 10px 12px;border-top:2px solid var(--blue);padding-top:8px;text-align:center;font-size:9px;color:var(--blue) }
+.orion .login { background:var(--blush) !important;border:2px solid var(--blue) !important;box-shadow:6px 6px 0 var(--blue) !important;color:var(--blue);font-family:var(--font-space-mono),monospace }
+.orion .wbar { background:var(--blush);border-bottom:2px solid var(--blue) !important }
+.orion .wbar .stripes { background-image:repeating-linear-gradient(180deg,var(--red) 0 1.5px,transparent 1.5px 4px) !important;background-color:transparent !important }
+.orion .wtitle { font-family:var(--font-krona-one),sans-serif !important;font-size:9px !important;color:var(--red);text-transform:uppercase;letter-spacing:.06em }
+.orion .closebox { border-color:var(--blue) !important;background:var(--blush) !important }
+.orion .cbtn:hover { background:var(--red) !important }
+.orion .login label, .orion .login .field span, .orion .login .me, .orion .login p { color:var(--blue);font-family:var(--font-space-mono),monospace }
+.orion .login label[style], .orion .login .field span[style] { font-size:12px !important;font-weight:700;text-transform:uppercase;letter-spacing:.06em }
+.orion .field input, .orion .input { font-family:var(--font-space-mono),monospace !important;font-size:15px !important;background:var(--color-white) !important;border:2px solid var(--blue) !important;color:var(--blue) !important;padding:7px 10px !important }
+.orion .field input:focus, .orion .input:focus { box-shadow:3px 3px 0 var(--red) !important }
+.orion .avatar { border-color:var(--blue) !important;background-color:var(--color-white) !important;background-image:radial-gradient(var(--red) 1.2px,transparent 1.6px) !important }
+.orion .linkbtn { font-family:var(--font-space-mono),monospace !important;font-size:11px !important;color:var(--red) !important }
+.orion .linkbtn:hover { background:var(--red) !important;color:var(--blush) !important }
+.orion .submit { font-family:var(--font-krona-one),sans-serif !important;font-size:10px !important;letter-spacing:.06em;background:var(--blush) !important;color:var(--red) !important;border:2px solid var(--red) !important;border-radius:0 !important;box-shadow:none !important;min-height:42px !important }
+.orion .submit.main { background:var(--red) !important;color:var(--color-white) !important;min-height:50px !important;font-size:12px !important }
+.orion .submit:hover, .orion .submit.main:hover { background:var(--blue) !important;color:var(--blush) !important;border-color:var(--blue) !important }
+.orion .submit:disabled, .orion .submit:disabled:hover { background:var(--blush) !important;color:var(--red) !important;border-color:var(--red) !important }
+.orion .mini { font-family:var(--font-krona-one),sans-serif !important;font-size:8.5px !important;background:var(--blush) !important;color:var(--blue) !important;border:2px solid var(--blue) !important;box-shadow:none !important }
+.orion .mini:hover { background:var(--blue) !important;color:var(--blush) !important }
+.orion .sep { border-top:2px dashed var(--red) !important }
+.orion .status { font-family:var(--font-space-mono),monospace;font-size:12px !important;border:2px solid var(--blue) !important;background:var(--color-white) !important;color:var(--blue) !important }
+.orion .status.err { background:var(--blue) !important;color:var(--color-white) !important }
+.orion .pips i, .orion .seats i { border-color:var(--blue) !important;background:var(--color-white) }
+.orion .pips i.on, .orion .seats i.on { background:var(--blue) !important }
+.orion .seats i.me { background:var(--red) !important }
+.orion .lname { font-family:var(--font-krona-one),sans-serif !important;font-size:14px !important;color:var(--red) }
+.orion .lvis, .orion .lnote { font-size:11px !important;color:var(--blue) }
+.orion .lcode b { font-family:var(--font-krona-one),sans-serif !important;font-size:15px !important;background:var(--blue) !important;color:var(--blush) !important }
+.orion .lcode span { font-size:10px }
+.orion .me { font-size:13px !important }
+.orion .meav { border-color:var(--blue) !important }
+.orion .mdlg { background:var(--blush) !important;border:2px solid var(--blue) !important;box-shadow:6px 6px 0 var(--blue) !important;color:var(--blue) !important;font-family:var(--font-space-mono),monospace !important }
+.orion .mdlg::backdrop { background-color:color-mix(in srgb, var(--color-red-100) 70%, transparent) !important;background-image:radial-gradient(var(--red) 1px,transparent 1.4px) !important }
+.orion .mdlg label, .orion .mdlg legend, .orion .mdlg p { color:var(--blue) }
+.orion .mdlg label[style], .orion .mdlg legend[style], .orion .mdlg p[style] { font-size:12px !important;font-weight:700;text-transform:uppercase;letter-spacing:.05em }
+.orion .vopt { border-color:var(--blue) !important;font-size:11px !important;background:var(--color-white) }
+.orion .vopt b { font-family:var(--font-krona-one),sans-serif !important;font-size:9px !important;color:var(--red) }
+.orion .vopt:has(input:checked) { box-shadow:4px 4px 0 var(--red) !important }
+.orion .vopt input { accent-color:var(--red) !important }
+@media (max-width:1099px) {
+  .orion .grid { grid-template-columns:minmax(0,1fr);max-width:600px }
+  .orion .col { grid-column:1 }
+  .orion .notes { display:none }
+  .orion .backband { top:760px }
+}
+@media (max-width:719px) {
+  .orion .scene { padding:14px 8px 40px }
+  .orion .col { border-width:7px }
+  .orion .hero { grid-template-columns:1fr;text-align:center }
+  .orion .hart { width:100%;max-width:240px;margin:0 auto }
+  .orion .htxt { text-align:center }
+  .orion .big { font-size:22px }
+  .orion .brand { font-size:24px }
+  .orion .mast { grid-template-columns:48px 1fr 84px }
+  .orion .rule { font-size:7.5px }
+  .orion .rule .replay { font-size:7.5px }
+  .orion .redblock { padding:22px 10px 26px }
+  .orion .cards { grid-template-columns:repeat(2,1fr);gap:12px }
+  .orion .backband { top:640px;height:420px }
+}
+.orion .lead { color:var(--color-neutral-950) !important }
+.orion .tagline { color:var(--color-neutral-950) !important }
+.orion .big { color:var(--color-neutral-950) !important;text-shadow:3px 3px 0 var(--color-red-600) }
+.orion .brand { color:var(--color-neutral-950) !important;text-shadow:3px 3px 0 var(--color-red-600) }
+.orion .sec { color:var(--color-neutral-950) !important }
+.orion .wtitle, .orion .linkbtn, .orion .lname, .orion .vopt b, .orion .cards li.on b { color:var(--color-neutral-950) !important }
+.orion .linkbtn:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .submit { color:var(--color-neutral-950) !important;border-color:var(--color-neutral-950) !important;background:var(--color-white) !important }
+.orion .submit.main { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .submit:hover, .orion .submit.main:hover { background:var(--color-red-600) !important;color:var(--color-neutral-950) !important;border-color:var(--color-neutral-950) !important }
+.orion .submit:disabled, .orion .submit:disabled:hover { background:var(--color-white) !important;color:var(--color-neutral-950) !important;border-color:var(--color-neutral-950) !important }
+.orion .mini:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .redblock { border-color:var(--color-neutral-950) !important }
+.orion .wbar .stripes { background-image:repeating-linear-gradient(180deg,var(--color-neutral-950) 0 1.5px,transparent 1.5px 4px) !important }
+.orion .sep { border-top-color:var(--color-neutral-950) !important }
+.orion .seats i.me { background:var(--color-cyan-400) !important }
+.orion .cards li svg { border-color:var(--color-neutral-950) !important }
+.orion .cards li.on svg { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .cards li.on b { color:var(--color-red-600) !important }
+.orion .vopt:has(input:checked) { box-shadow:4px 4px 0 var(--color-neutral-950) !important }
+.orion .vopt input { accent-color:var(--color-neutral-950) !important }
+.orion .mdlg::backdrop { background-color:color-mix(in srgb, var(--color-white) 70%, transparent) !important;background-image:radial-gradient(var(--color-neutral-950) 1px,transparent 1.4px) !important }
+.orion .status.err { background:var(--color-neutral-950) !important }
+.orion .field input:focus, .orion .input:focus { box-shadow:3px 3px 0 var(--color-red-600) !important }
+.orion .backband { background:var(--color-red-600) !important;border-top:5px solid var(--color-neutral-950) !important;border-bottom:5px solid var(--color-neutral-950) !important }
+.orion .backband { height:500px !important;top:560px !important }
+@media (max-width:1099px) {
+  .orion .backband { height:440px !important;top:520px !important }
+}
+@media (max-width:719px) {
+  .orion .backband { height:380px !important;top:420px !important }
+}
+.orion { background-image:radial-gradient(color-mix(in srgb, var(--color-neutral-950) 16%, transparent) 1.6px,transparent 2px) !important;background-size:22px 22px !important;background-position:11px 11px !important }
+.orion .brand, .orion .big { text-shadow:none !important }
+.orion .big span { background:var(--color-red-600);color:var(--color-neutral-950);padding:0 6px;margin-right:-6px }
+.orion .minfo b::before { content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--color-orange-500);margin-right:4px;vertical-align:1px }
+.orion .redblock { background:var(--color-neutral-950) !important;border-color:var(--color-neutral-950) !important }
+.orion .lead { color:var(--color-white) !important }
+.orion .redblock .login { box-shadow:8px 8px 0 var(--color-red-600) !important;border-color:var(--color-white) !important }
+.orion .submit.main { background:var(--color-red-600) !important;color:var(--color-neutral-950) !important;border:2px solid var(--color-neutral-950) !important }
+.orion .submit.main:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .submit:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .redblock .login .submit.main { box-shadow:3px 3px 0 var(--color-neutral-950) !important }
+.orion .sun { background:repeating-conic-gradient(from 3deg at 50% 50%,var(--color-neutral-950) 0 7deg,var(--color-white) 7deg 22.5deg) !important }
+.orion .bcircle { background-color:var(--color-white) !important;background-image:radial-gradient(var(--color-neutral-950) 1.2px,transparent 1.6px) !important;background-size:7px 7px !important;border-color:var(--color-neutral-950) !important }
+.orion .bcircle::after { content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,var(--color-white) 0 38%,color-mix(in srgb, var(--color-white) 0%, transparent) 72%) }
+.orion .bcircle .lfish { z-index:1 }
+.orion .disc { background:var(--color-neutral-950) !important }
+.orion .cards li.on b { color:var(--color-neutral-950) !important }
+.orion .cards li.on svg { background:var(--color-neutral-950) !important }
+.orion .cards li:hover svg { background:var(--color-red-600);color:var(--color-neutral-950) }
+.orion .sec { display:inline-block;background:var(--color-neutral-950);color:var(--color-white) !important;padding:4px 10px }
+.orion .tagline { font-style:italic }
+.orion .status.err::before { color:var(--color-red-600) !important }
+.orion .pips i.on { background:var(--color-neutral-950) !important }
+.orion { --red:var(--color-red-600);--navy:var(--color-blue-900) }
+.orion .big span { background:var(--navy) !important;color:var(--color-white) !important }
+.orion .redblock .login { box-shadow:8px 8px 0 var(--navy) !important }
+.orion .cards li:hover svg { background:var(--navy) !important;color:var(--color-white) !important }
+.orion .vlabel { background:linear-gradient(180deg,var(--navy) 0%,var(--color-blue-600) 55%,var(--color-blue-100) 100%) !important }
+.orion .vlabel span { color:var(--color-white) !important;-webkit-text-stroke:1px var(--color-neutral-950) !important;paint-order:stroke fill }
+.orion .mlogo svg path { fill:var(--color-neutral-950) }
+.orion .field input:focus, .orion .input:focus { box-shadow:3px 3px 0 var(--navy) !important }
+.orion .seats i.me { background:var(--navy) !important }
+.orion .status.err::before { color:var(--red) !important }
+.orion .sun { background:repeating-conic-gradient(from 3deg at 50% 50%,var(--red) 0 9deg,var(--color-white) 9deg 22.5deg) !important }
+.orion .bcircle { background-color:var(--color-white) !important;background-size:auto !important;border-color:var(--color-neutral-950) !important;
+  background-image:repeating-radial-gradient(circle at 50% 50%,transparent 0 9px,var(--red) 9px 11px) !important }
+.orion .bcircle::after { display:none !important }
+.orion .bcircle .lfish { --blue:var(--color-indigo-700);--blush:var(--color-white) }
+.orion .redblock { background:var(--red) !important;border:2px solid var(--color-neutral-950) !important }
+.orion .redblock .lead { color:var(--color-white) !important }
+.orion .redblock .login { background:var(--color-white) !important;border:2px solid var(--color-neutral-950) !important;box-shadow:8px 8px 0 var(--color-neutral-950) !important }
+.orion .redblock .wbar { background:var(--color-white) !important;border-bottom-color:var(--color-neutral-950) !important }
+.orion .redblock .wbar .stripes { background-image:repeating-linear-gradient(180deg,var(--red) 0 1.5px,transparent 1.5px 4px) !important }
+.orion .redblock .wtitle { color:var(--red) !important }
+.orion .redblock .closebox { border-color:var(--color-neutral-950) !important;background:var(--color-white) !important }
+.orion .redblock .login label[style], .orion .redblock .login .field span[style] { color:var(--color-neutral-950) !important }
+.orion .redblock .field input, .orion .redblock .input { border-color:var(--color-neutral-950) !important;color:var(--color-neutral-950) !important;background:var(--color-white) !important }
+.orion .redblock .avatar { border-color:var(--color-neutral-950) !important;background-image:radial-gradient(var(--red) 1.2px,transparent 1.6px) !important }
+.orion .redblock .linkbtn { color:var(--red) !important }
+.orion .redblock .linkbtn:hover { background:var(--red) !important;color:var(--color-white) !important }
+.orion .redblock .submit { background:var(--color-white) !important;color:var(--red) !important;border:2px solid var(--red) !important;box-shadow:none !important }
+.orion .redblock .submit.main { background:var(--red) !important;color:var(--color-white) !important;border-color:var(--red) !important;box-shadow:none !important }
+.orion .redblock .submit:hover, .orion .redblock .submit.main:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important;border-color:var(--color-neutral-950) !important }
+.orion .redblock .mini { background:var(--color-white) !important;color:var(--color-neutral-950) !important;border:2px solid var(--color-neutral-950) !important }
+.orion .redblock .mini:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .redblock .sep { border-top:2px dashed var(--red) !important }
+.orion .redblock .field input:focus, .orion .redblock .input:focus { box-shadow:3px 3px 0 var(--red) !important }
+.orion .redblock .login .submit.main { box-shadow:none !important }
+.orion .scene { padding-bottom:0 !important;min-height:100vh;box-sizing:border-box;display:flex;flex-direction:column }
+.orion .scene > .grid { flex:1;width:100% }
+.orion .col { border-bottom:0 !important;display:flex;flex-direction:column;min-height:100% }
+.orion .col .paper { flex:1;display:flex;flex-direction:column }
+.orion .pfoot { margin-top:auto !important;padding-bottom:28px }
+.orion .grid { align-items:stretch !important }
+.orion .sidetabs { position:absolute;right:26px;top:130px;display:flex;flex-direction:row;gap:14px;align-items:flex-start }
+.orion .stab { position:relative;width:78px;height:270px;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;
+  padding:20px 0 18px;border:3px solid var(--color-neutral-950);color:var(--color-white);font-family:var(--font-space-mono),monospace;
+  background:linear-gradient(180deg,var(--color-blue-900) 0%,var(--color-blue-700) 55%,var(--color-blue-300) 100%);box-shadow:6px 6px 0 var(--color-neutral-950);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),filter .2s,box-shadow .25s }
+.orion .stab .k { writing-mode:vertical-rl;font-family:var(--font-noto-jp),'Hiragino Sans',sans-serif;font-weight:300;font-size:34px;line-height:1;letter-spacing:.06em;-webkit-text-stroke:.6px var(--color-neutral-950);paint-order:stroke fill }
+.orion .stab .tx { writing-mode:vertical-rl;transform:rotate(180deg);display:flex;flex-direction:row;gap:4px;margin-top:auto }
+.orion .stab b { font-family:var(--font-krona-one),sans-serif;font-weight:400;font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-shadow:1px 1px 0 var(--color-neutral-950) }
+.orion .stab small { display:none }
+.orion .stab[aria-selected=false] { filter:saturate(.3) brightness(1.2);transform:translateY(16px);box-shadow:3px 3px 0 var(--color-neutral-950) }
+.orion .stab[aria-selected=false]:hover { filter:saturate(.7) brightness(1.1);transform:translateY(8px) }
+.orion .stab[aria-selected=true] { transform:none;box-shadow:6px 6px 0 var(--color-neutral-950) }
+.orion .stab[aria-selected=true]::after { content:"";position:absolute;left:50%;bottom:-16px;width:14px;height:14px;margin-left:-7px;background:var(--color-red-600);border:3px solid var(--color-neutral-950);transform:rotate(45deg) }
+.orion .stab:focus-visible { outline:3px solid var(--color-red-600);outline-offset:4px }
+.orion .mtabs { display:none }
+.orion .panel[hidden] { display:none !important }
+.orion .authf { display:flex;flex-direction:column;gap:12px }
+.orion .alinks { display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap }
+.orion .lbl2 { display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--color-neutral-950) }
+.orion .acc { display:block;font-family:var(--font-krona-one),sans-serif;font-weight:400;font-size:14px;color:var(--color-neutral-950);margin:4px 0;word-break:break-all }
+.orion .logged .avatar { width:76px;height:76px;display:grid;place-items:center }
+.orion .logged .avatar svg { width:60px;height:60px }
+@media (max-width:1099px) {
+  .orion .mtabs { display:flex;width:380px;max-width:100%;margin:0 auto 14px;gap:8px }
+  .orion .redblock .stage { flex-direction:column;align-items:center }
+  .orion .mtab { flex:1;cursor:pointer;padding:10px 8px;border:3px solid var(--color-neutral-950);color:var(--color-white);font-family:var(--font-krona-one),sans-serif;font-size:10px;letter-spacing:.04em;text-transform:uppercase;
+    background:linear-gradient(180deg,var(--color-blue-900) 0%,var(--color-blue-600) 100%);box-shadow:4px 4px 0 var(--color-neutral-950) }
+  .orion .mtab[aria-selected=false] { filter:saturate(.35) brightness(1.2) }
+}
+.orion .rule { font-size:10.5px }
+.orion .rule .replay { font-size:10.5px }
+.orion .minfo { font-size:9px }
+.orion .lead { font-size:12.5px;max-width:42ch }
+.orion .tagline { font-size:12px }
+.orion .cards b { font-size:10.5px }
+.orion .cards span { font-size:10.5px;line-height:1.3 }
+.orion .pfoot { font-size:10.5px }
+.orion .sec { font-size:15px }
+@media (min-width:1400px) {
+  .orion .grid { max-width:1320px;grid-template-columns:minmax(0,1fr) 620px minmax(0,.3fr) }
+  .orion .big { font-size:28px }
+}
+@media (max-width:1099px) {
+  .orion .scene { padding-top:28px }
+  .orion .grid { max-width:640px !important }
+  .orion .redblock { padding:26px 18px 30px }
+  .orion .mtabs { width:400px }
+}
+@media (max-width:719px) {
+  .orion .mast { grid-template-columns:52px 1fr !important }
+  .orion .minfo { display:none }
+  .orion .brand { font-size:26px !important;padding:16px 6px 14px }
+  .orion .rule { display:grid !important;grid-template-columns:repeat(3,1fr);font-size:11px }
+  .orion .rule span, .orion .rule .replay { border-bottom:2px solid var(--color-neutral-950);padding:6px 2px;font-size:11px }
+  .orion .rule .replay { grid-column:1 / -1;border-bottom:0;border-right:0 }
+  .orion .rule span:nth-child(3n) { border-right:0 }
+  .orion .hero { padding:22px 14px 28px }
+  .orion .big { font-size:22px !important;margin-bottom:22px }
+  .orion .lead { font-size:13px }
+  .orion .tagline { font-size:13px;padding:0 14px }
+  .orion .redblock .stage { width:100% }
+  .orion .mtabs { width:100% }
+  .orion .mtab { font-size:10px;padding:12px 6px;min-height:44px }
+  .orion .sun { height:300px }
+  .orion .cards { grid-template-columns:repeat(4,1fr) !important;gap:8px }
+  .orion .cards li svg { padding:22% }
+  .orion .cards b { font-size:9.5px }
+  .orion .cards span { font-size:9.5px }
+}
+@media (max-width:479px) {
+  .orion .cards { grid-template-columns:repeat(2,1fr) !important;gap:14px 10px }
+  .orion .cards li svg { max-width:120px }
+  .orion .cards b { font-size:11px }
+  .orion .cards span { font-size:11px }
+  .orion .sun { height:260px }
+  .orion .bcircle { width:190px;height:190px;margin:-95px 0 0 -95px }
+  .orion .wbody { padding:16px 16px 18px }
+  .orion .login .who { gap:12px }
+}
+@media (max-width:719px) {
+  .orion .redblock .login { width:100% !important;max-width:440px }
+  .orion .mtabs { max-width:440px }
+}
+.orion .roomsPage { position:fixed;inset:0;z-index:40;overflow:auto;background-color:var(--color-white);
+  background-image:radial-gradient(color-mix(in srgb, var(--color-neutral-950) 14%, transparent) 1.4px,transparent 1.8px);background-size:20px 20px;color:var(--color-neutral-950);font-family:var(--font-space-mono),monospace }
+.orion .roomsPage[hidden] { display:none !important }
+.orion .rp-wrap { max-width:1060px;margin:0 auto;padding:28px 20px 40px }
+.orion .rp-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(5,minmax(150px,auto));
+  border:6px solid var(--color-neutral-950);background:var(--color-neutral-950);gap:3px;box-shadow:10px 10px 0 var(--color-neutral-950) }
+.orion .cell { position:relative;background:var(--color-white);border:0;padding:12px 12px 10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0;font-family:inherit;color:var(--color-neutral-950) }
+.orion .cell .num { position:absolute;top:8px;right:8px;background:var(--color-neutral-950);color:var(--color-white);font-family:var(--font-krona-one),sans-serif;font-size:13px;line-height:1;padding:6px 7px }
+.orion .cell .pic { width:64%;max-width:120px;aspect-ratio:1;margin:4px auto 0 }
+.orion .cell .pic svg { width:100%;height:100% }
+.orion .cell .cn { font-family:var(--font-krona-one),sans-serif;font-size:11.5px;line-height:1.25;margin-top:auto;word-break:break-word;padding-right:4px }
+.orion .cell .cm { font-size:10.5px;line-height:1.3;color:var(--color-neutral-800) }
+.orion .cell .pips { max-width:none }
+.orion .cell .pips i { width:8px;height:8px;border-width:1.5px }
+.orion .cell:hover { background:var(--color-neutral-100) }
+.orion .cell:hover .pic svg { transform:rotate(-4deg) scale(1.04) }
+.orion .cell .pic svg { transition:transform .2s }
+.orion .cell[aria-pressed=true] { background:var(--color-neutral-950);color:var(--color-white) }
+.orion .cell[aria-pressed=true] .cm { color:var(--color-neutral-200) }
+.orion .cell[aria-pressed=true] .num { background:var(--color-red-600);color:var(--color-white) }
+.orion .cell[aria-pressed=true] .pic svg { filter:invert(1) }
+.orion .cell[aria-pressed=true] .pips i { border-color:var(--color-white) !important;background:transparent }
+.orion .cell[aria-pressed=true] .pips i.on { background:var(--color-white) !important }
+.orion .cell:focus-visible { outline:3px solid var(--color-red-600);outline-offset:-6px }
+.orion .cell.more { align-items:center;justify-content:center;text-align:center;background:var(--color-white) }
+.orion .cell.more .cn { margin:0 }
+.orion .rp-center { grid-column:2 / 4;grid-row:2 / 5;background:var(--color-white);display:flex;flex-direction:column;padding:18px 20px;gap:14px;min-width:0 }
+.orion .rc-head { display:flex;justify-content:space-between;gap:14px;align-items:flex-start;border-bottom:3px solid var(--color-neutral-950);padding-bottom:12px }
+.orion .rc-title { display:flex;gap:10px;align-items:flex-start }
+.orion .rc-title h2 { margin:0;font-family:var(--font-krona-one),sans-serif;font-weight:400;font-size:24px;line-height:1.1;outline:none }
+.orion .rc-kat { writing-mode:vertical-rl;font-family:var(--font-noto-jp),'Hiragino Sans',sans-serif;font-weight:300;font-size:20px;border:2px solid var(--color-neutral-950);padding:6px 3px;line-height:1 }
+.orion .rc-side { display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:0 }
+.orion .rc-count { margin:0;font-size:11px;text-align:right }
+.orion .rc-side .rtools { display:flex;gap:6px }
+.orion .rc-side .input { width:150px;font-size:13px !important;padding:6px 8px !important }
+.orion .rc-detail { flex:1;display:grid;grid-template-columns:42% 1fr;gap:16px;align-items:center;min-height:200px }
+.orion .rd-pic { position:relative;aspect-ratio:1;border-radius:50%;background:var(--color-white);border:4px solid var(--color-neutral-950);overflow:hidden;
+  background-image:repeating-radial-gradient(circle at 50% 50%,transparent 0 8px,color-mix(in srgb, var(--color-red-600) 85%, transparent) 8px 10px) }
+.orion .rd-pic svg { position:absolute;inset:14%;width:72%;height:72% }
+.orion .rd-name { margin:0 0 6px;font-family:var(--font-krona-one),sans-serif;font-weight:400;font-size:19px;line-height:1.2;word-break:break-word }
+.orion .rd-tag { display:inline-block;background:var(--color-neutral-950);color:var(--color-white);font-size:10px;letter-spacing:.1em;padding:3px 8px;text-transform:uppercase;margin-bottom:10px }
+.orion .rd-list { margin:0 0 10px;padding:0;list-style:none;font-size:12px;border-top:2px solid var(--color-neutral-950) }
+.orion .rd-list li { display:flex;justify-content:space-between;border-bottom:1px dashed var(--color-neutral-950);padding:5px 0 }
+.orion .rd-list b { font-weight:700 }
+.orion .rd-seats { display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px }
+.orion .rd-seats i { width:14px;height:14px;border:2px solid var(--color-neutral-950);background:var(--color-white) }
+.orion .rd-seats i.on { background:var(--color-neutral-950) }
+.orion .rd-note { font-size:10px;color:var(--color-neutral-600);margin:0 0 10px }
+.orion .rd-join { width:100%;min-height:46px;border:2px solid var(--color-neutral-950);background:var(--color-red-600);color:var(--color-white);font-family:var(--font-krona-one),sans-serif;font-size:12px;letter-spacing:.06em;cursor:pointer;box-shadow:4px 4px 0 var(--color-neutral-950) }
+.orion .rd-join:hover { background:var(--color-neutral-950) }
+.orion .rd-join:active { transform:translate(2px,2px);box-shadow:2px 2px 0 var(--color-neutral-950) }
+.orion .rd-join:disabled { background:var(--color-white);color:var(--color-neutral-950);cursor:not-allowed;box-shadow:none }
+.orion .rd-empty { grid-column:1 / -1;text-align:center;font-size:13px;line-height:1.5 }
+.orion .rc-foot { display:flex;flex-direction:column;gap:10px;border-top:3px solid var(--color-neutral-950);padding-top:12px }
+.orion .rc-btns { display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap }
+.orion .roomsPage .mini { background:var(--color-white) !important;color:var(--color-neutral-950) !important;border:2px solid var(--color-neutral-950) !important;font-family:var(--font-krona-one),sans-serif !important;font-size:9.5px !important;padding:0 12px;min-height:36px }
+.orion .roomsPage .mini:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .roomsPage .status { font-size:12px !important }
+@media (max-width:860px) {
+  .orion .rp-grid { grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:minmax(140px,auto) }
+  .orion .rp-center { grid-column:1 / -1 !important;grid-row:1 !important }
+  .orion .cell { grid-column:auto !important;grid-row:auto !important }
+}
+@media (max-width:560px) {
+  .orion .rp-wrap { padding:12px 10px 28px }
+  .orion .rp-grid { grid-template-columns:repeat(2,minmax(0,1fr));border-width:4px;box-shadow:6px 6px 0 var(--color-neutral-950) }
+  .orion .rc-head { flex-direction:column }
+  .orion .rc-side { align-items:stretch;width:100% }
+  .orion .rc-count { text-align:left }
+  .orion .rc-side .input { width:auto;flex:1 }
+  .orion .rc-detail { grid-template-columns:1fr }
+  .orion .rd-pic { max-width:180px;width:100%;margin:0 auto }
+}
+.orion { --pink:var(--color-pink-500);--cyan:var(--color-sky-400);--yellow:var(--color-yellow-300);--lime:var(--color-lime-400) }
+.orion .cell .sfx2 { position:absolute;left:10px;top:10px;font-family:var(--font-noto-jp),'Hiragino Sans',sans-serif;font-weight:900;font-size:13px;line-height:1;writing-mode:vertical-rl;color:var(--color-neutral-950);
+  -webkit-text-stroke:3px var(--color-white);paint-order:stroke fill;transform:rotate(-6deg) }
+.orion .cell[aria-pressed=true] .pic svg { filter:none }
+.orion .cell[aria-pressed=true] { background-color:var(--color-neutral-950);background-image:radial-gradient(color-mix(in srgb, var(--color-white) 18%, transparent) 1.2px,transparent 1.6px);background-size:6px 6px }
+.orion .cell[aria-pressed=true] .pic { background:var(--color-white);border-radius:50%;border:3px solid var(--yellow);padding:6% }
+.orion .cell[aria-pressed=true] .num { background:var(--pink);color:var(--color-neutral-950) }
+.orion .cell[aria-pressed=true] .sfx2 { color:var(--yellow);-webkit-text-stroke:3px var(--color-neutral-950) }
+.orion .cell:hover { background:var(--color-yellow-100) }
+.orion .rd-pic { border-color:var(--color-neutral-950) !important;background-color:var(--yellow) !important;
+  background-image:repeating-conic-gradient(from 0deg at 50% 50%,var(--color-white) 0 6deg,transparent 6deg 15deg) !important }
+.orion .rd-bubble { position:absolute;right:-2%;top:2%;background:var(--color-white);border:3px solid var(--color-neutral-950);border-radius:50%;padding:8px 10px;font-family:var(--font-noto-jp),'Hiragino Sans',sans-serif;font-weight:900;font-size:16px;line-height:1;transform:rotate(8deg);box-shadow:3px 3px 0 var(--pink) }
+.orion .rd-pic { overflow:visible !important }
+.orion .rd-tag { background:var(--pink) !important;color:var(--color-neutral-950) !important;border:2px solid var(--color-neutral-950) }
+.orion .rd-join { background:var(--pink) !important;color:var(--color-neutral-950) !important }
+.orion .rd-join:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
+.orion .rd-seats i.on { background:var(--color-neutral-950) }
+.orion .rc-kat { background:var(--cyan);display:flex;align-items:center;justify-content:center;width:34px;min-height:60px;padding:6px 0 !important;box-sizing:border-box }
+.orion .rc-title h2 { text-shadow:2px 2px 0 var(--yellow) }
+.orion .rp-grid { box-shadow:10px 10px 0 var(--pink) !important;border-color:var(--color-neutral-950) }
+.orion .cell .num { background:var(--color-neutral-950) }
+.orion .cell[aria-pressed=true]:hover { background-color:var(--color-neutral-950) !important }
+.orion .rc-kat { font-size:16px !important;min-height:68px !important;line-height:1.1 !important }
+.orion .rp-grid { grid-template-rows:none;box-shadow:10px 10px 0 var(--color-neutral-950) !important }
+.orion .cell.more { background:var(--color-white) }
+.orion .cell.more .plus { font-family:var(--font-krona-one),sans-serif;font-size:26px;color:var(--color-red-600) }
+.orion .cell.more .cn { font-size:10px;text-align:center }
+.orion .cell:hover { background:var(--color-neutral-100) !important }
+.orion .cell[aria-pressed=true], .orion .cell[aria-pressed=true]:hover { background-color:var(--color-neutral-950) !important;background-image:radial-gradient(color-mix(in srgb, var(--color-white) 16%, transparent) 1.2px,transparent 1.6px);background-size:6px 6px }
+.orion .cell[aria-pressed=true] .pic { border-color:var(--color-red-600) !important }
+.orion .cell[aria-pressed=true] .num { background:var(--color-red-600) !important;color:var(--color-white) !important }
+.orion .cell[aria-pressed=true] .sfx2 { color:var(--color-white) !important;-webkit-text-stroke:3px var(--color-neutral-950) }
+.orion .rd-pic { background-color:var(--color-white) !important;background-image:repeating-conic-gradient(from 3deg at 50% 50%,var(--color-red-600) 0 7deg,var(--color-white) 7deg 18deg) !important }
+.orion .rd-bubble { box-shadow:3px 3px 0 var(--color-blue-900) !important }
+.orion .rd-tag { background:var(--color-neutral-950) !important;color:var(--color-white) !important;border:0 }
+.orion .rd-join { background:var(--color-red-600) !important;color:var(--color-white) !important }
+.orion .rd-join:hover { background:var(--color-neutral-950) !important }
+.orion .rc-kat { background:linear-gradient(180deg,var(--color-blue-900),var(--color-blue-600)) !important;color:var(--color-white);border-color:var(--color-neutral-950) !important }
+.orion .rc-title h2 { text-shadow:none !important }
+.orion .cell .pic { display:flex;align-items:center;justify-content:center }
+@media (max-width:860px) {
+  .orion .rp-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important;grid-template-rows:none !important;grid-auto-rows:minmax(150px,auto) }
+  .orion .rp-center { grid-column:1 / -1 !important;grid-row:auto !important;order:-1 }
+  .orion .cell { grid-column:auto !important;grid-row:auto !important }
+}
+.orion .cell[aria-pressed=true], .orion .cell[aria-pressed=true]:hover { background:var(--color-white) !important;background-image:none !important;color:var(--color-neutral-950) !important;box-shadow:inset 0 0 0 5px var(--color-red-600) }
+.orion .cell[aria-pressed=true] .cm { color:var(--color-neutral-800) !important }
+.orion .cell[aria-pressed=true] .pic { background:none !important;border:0 !important;padding:0 !important;border-radius:0 }
+.orion .cell[aria-pressed=true] .pips i { border-color:var(--color-neutral-950) !important;background:var(--color-white) }
+.orion .cell[aria-pressed=true] .pips i.on { background:var(--color-neutral-950) !important }
+.orion .cell[aria-pressed=true] .sfx2 { color:var(--color-red-600) !important;-webkit-text-stroke:3px var(--color-white) }
+.orion .cell[aria-pressed=true]::after { content:"◀ CHOISI";position:absolute;right:10px;bottom:10px;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--color-red-600) }
+@media (max-width:860px) {
+  .orion .rp-grid > .cell:nth-child(even):last-child { grid-column:1 / -1 !important }
+}
+html:has(.orion) { scroll-behavior:smooth }
+.orion { --ease:cubic-bezier(.22,.8,.24,1) }
+.orion button, .orion .input, .orion .field input, .orion .cell, .orion .stab, .orion .mtab { transition:background-color .22s ease,color .22s ease,border-color .22s ease,box-shadow .25s var(--ease),transform .2s var(--ease),filter .25s ease }
+.orion .submit:active, .orion .mini:active, .orion .rd-join:active, .orion .mtab:active { transform:translateY(1px) scale(.985) }
+.orion .cell:hover:not([aria-pressed=true]) { transform:translateY(-2px) }
+.orion .cell:active { transform:translateY(0) scale(.99) }
+.orion .enter { animation:winIn .45s var(--ease) both }
+@keyframes winIn {from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.orion .swap { animation:swapIn .35s var(--ease) both }
+@keyframes swapIn {from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.orion .pageIn { animation:pageIn .38s var(--ease) both }
+.orion .pageIn .rp-grid { animation:gridIn .5s var(--ease) both }
+@keyframes pageIn {from{opacity:0}to{opacity:1}}
+@keyframes gridIn {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pageOut {to{opacity:0}}
+.orion .cellIn { animation:cellIn .42s var(--ease) both;animation-delay:var(--d,0ms) }
+@keyframes cellIn {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.orion .status:not([hidden]) { animation:statusIn .3s var(--ease) both }
+@keyframes statusIn {from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.orion .seats i.pop { animation:seatPop .4s var(--ease) both }
+@keyframes seatPop {0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15);opacity:1}100%{transform:none}}
+.orion dialog.mdlg[open] { animation:dlgIn .32s var(--ease) both }
+.orion dialog.mdlg[open]::backdrop { animation:bdIn .3s ease both }
+@keyframes dlgIn {from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes bdIn {from{opacity:0}to{opacity:1}}
+.orion .rd-bubble { animation:bob 3.2s ease-in-out infinite }
+@keyframes bob {0%,100%{transform:rotate(8deg) translateY(0)}50%{transform:rotate(6deg) translateY(-4px)}}
+.orion .rd-pic { transition:transform .4s var(--ease) }
+.orion .rd-pic:hover { transform:rotate(-4deg) }
+@media (prefers-reduced-motion:reduce) {
+  .orion .enter, .orion .swap, .orion .pageIn, .orion .pageIn .rp-grid, .orion .cellIn, .orion .status:not([hidden]), .orion .seats i.pop, .orion dialog.mdlg[open], .orion dialog.mdlg[open]::backdrop, .orion .rd-bubble { animation:none !important }
+  html:has(.orion) { scroll-behavior:auto }
+}
+.orion { --soft:cubic-bezier(.16,1,.3,1) }
+.orion button, .orion .input, .orion .field input, .orion .cell, .orion .stab, .orion .mtab { transition:background-color .35s var(--soft),color .35s var(--soft),border-color .35s var(--soft),box-shadow .45s var(--soft),transform .45s var(--soft),filter .4s var(--soft) !important }
+.orion .submit:active, .orion .mini:active, .orion .rd-join:active, .orion .mtab:active { transform:scale(.97) !important;transition-duration:.12s !important }
+.orion .cell:hover:not([aria-pressed=true]) { transform:translateY(-3px) }
+.orion .redblock .submit:hover, .orion .redblock .submit.main:hover { transform:translateY(-1px) }
+.orion .enter { animation:winIn .7s var(--soft) both }
+@keyframes winIn {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.orion .swap { animation:swapIn .6s var(--soft) both }
+@keyframes swapIn {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.orion .pageIn { animation:pageIn .5s var(--soft) both }
+.orion .pageIn .rp-grid { animation:gridIn .8s var(--soft) both }
+@keyframes gridIn {from{opacity:0;transform:translateY(24px) scale(.985)}to{opacity:1;transform:none}}
+.orion .cellIn { animation:cellIn .8s var(--soft) both;animation-delay:calc(var(--d,0ms) + 120ms) }
+@keyframes cellIn {from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.orion .status:not([hidden]) { animation:statusIn .55s var(--soft) both }
+@keyframes statusIn {from{opacity:0;transform:translateY(-8px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0)}}
+.orion .seats i.pop { animation:seatPop .6s var(--soft) both }
+@keyframes seatPop {from{transform:scale(.3) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+.orion dialog.mdlg[open] { animation:dlgIn .6s var(--soft) both }
+.orion dialog.mdlg[open]::backdrop { animation:bdIn .5s ease both }
+@keyframes dlgIn {from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+.orion .rd-bubble { animation:bob 4s ease-in-out infinite }
+.orion #winHome, .orion #winLobby { view-transition-name:game }
+.orion.rooms-open #winHome, .orion.rooms-open #winLobby, .orion.rooms-open #panelAnon, .orion.rooms-open #panelAuth { view-transition-name:none }
+.orion #panelAnon, .orion #panelAuth { view-transition-name:panel }
+::view-transition-group(*) { animation-duration:.65s;animation-timing-function:var(--soft) }
+::view-transition-old(root) { animation:none }
+::view-transition-new(root) { animation:vtIn .5s var(--soft) both }
+::view-transition-old(game), ::view-transition-new(game), ::view-transition-old(panel), ::view-transition-new(panel) { height:100%;object-fit:none;object-position:50% 0 }
+::view-transition-old(game), ::view-transition-old(panel) { animation:vtOut .35s ease both }
+::view-transition-new(game), ::view-transition-new(panel) { animation:vtIn .55s var(--soft) both }
+::view-transition-image-pair(game), ::view-transition-image-pair(panel), ::view-transition-image-pair(salons) { overflow:hidden }
+::view-transition-group(salons) { animation-duration:.75s }
+::view-transition-old(salons) { animation:vtOut .2s ease both }
+::view-transition-new(salons) { height:100%;object-fit:none;object-position:50% 0;animation:vtIn .45s .1s var(--soft) both }
+::view-transition-group(roompic) { animation-duration:.7s }
+@keyframes vtOut {to{opacity:0}}
+@keyframes vtIn {from{opacity:0}}
+@media (prefers-reduced-motion:reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation:none !important }
+}
+.orion .cards li.mock svg { padding:0 !important;background:var(--color-white) !important;color:var(--color-neutral-300) !important;border:2px dashed var(--color-neutral-300) !important }
+.orion .cards li.mock b { color:var(--color-neutral-950) !important }
+.orion .cards li.mock span { color:var(--color-neutral-500) }
+
