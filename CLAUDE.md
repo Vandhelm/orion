@@ -106,7 +106,7 @@ bun --hot ./index.ts
 
 For more information, read the Bun API docs in `node_modules/bun-types/docs/**.mdx`.
 
-## Conventions OBRION
+## Conventions ORION
 
 Ce projet est une application **Next.js** (App Router, code dans `src/`). Bun sert de gestionnaire de paquets et à lancer les scripts (`bun run dev`, `bun run build`, `bun run lint`). Les consignes Bun plus haut sur `Bun.serve()` et les imports HTML ne s'appliquent pas au frontend : les pages et les routes d'API passent par Next.js.
 

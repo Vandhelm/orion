@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OBRION",
-  description: "OBRION",
+  title: "ORION",
+  description: "ORION",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
