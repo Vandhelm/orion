@@ -116,13 +116,18 @@ function focusAfter(transition: ViewTransition | null, target: HTMLElement | nul
   else focus();
 }
 
-type GameProviderProps = { initialAccount: PlayerAccount | null; children: ReactNode };
+type GameProviderProps = {
+  initialAccount: PlayerAccount | null;
+  /** Retour d'une connexion Discord / GitHub qui a échoué : on rouvre l'onglet Authentification avec un message. */
+  socialSignInFailed?: boolean;
+  children: ReactNode;
+};
 
 /**
  * État du jeu (maquette locale) : mode de connexion, pilote, salons, salle d'attente,
  * fenêtres et boîtes de dialogue. Les règles vivent dans `rooms.ts` ; ici, on orchestre.
  */
-export function GameProvider({ initialAccount, children }: GameProviderProps) {
+export function GameProvider({ initialAccount, socialSignInFailed = false, children }: GameProviderProps) {
   const nicknameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const homeWindowRef = useRef<HTMLElement>(null);
@@ -132,7 +137,7 @@ export function GameProvider({ initialAccount, children }: GameProviderProps) {
   const roomsButtonRef = useRef<HTMLButtonElement>(null);
   const playButtonRef = useRef<HTMLButtonElement>(null);
 
-  const [mode, setMode] = useState<Mode>(initialAccount ? "auth" : "anon");
+  const [mode, setMode] = useState<Mode>(initialAccount || socialSignInFailed ? "auth" : "anon");
   const [account, setAccount] = useState<PlayerAccount | null>(initialAccount);
   const [nickname, setNickname] = useState(DEFAULT_NICKNAME);
   const [nicknameInvalid, setNicknameInvalid] = useState(false);
@@ -143,7 +148,9 @@ export function GameProvider({ initialAccount, children }: GameProviderProps) {
   const [rooms, setRooms] = useState<Room[]>(createSeedRooms);
   const roomsRef = useRef(rooms);
   const [lobby, setLobby] = useState<Lobby | null>(null);
-  const [statuses, setStatuses] = useState<Partial<Record<StatusArea, Status>>>({});
+  const [statuses, setStatuses] = useState<Partial<Record<StatusArea, Status>>>(() =>
+    socialSignInFailed ? { auth: { message: "La connexion a échoué. Réessaie.", error: true } } : {},
+  );
   const [busy, setBusy] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [roomsQuery, setRoomsQuery] = useState("");

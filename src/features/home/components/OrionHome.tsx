@@ -12,10 +12,12 @@ import { Masthead } from "./Masthead";
 import "../orion.css";
 
 /** Page d'accueil O.R.I.O.N : intro, colonne journal, fenêtre de jeu, salons. */
-export function OrionHome({ initialAccount }: { initialAccount: PlayerAccount | null }) {
+type OrionHomeProps = { initialAccount: PlayerAccount | null; socialSignInFailed: boolean };
+
+export function OrionHome({ initialAccount, socialSignInFailed }: OrionHomeProps) {
   return (
     <ReplayProvider>
-      <GameProvider initialAccount={initialAccount}>
+      <GameProvider initialAccount={initialAccount} socialSignInFailed={socialSignInFailed}>
         <GameShell>
           <Intro />
           <div className="scene">
