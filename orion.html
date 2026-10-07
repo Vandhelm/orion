@@ -970,7 +970,7 @@ body.rooms-open #winHome,body.rooms-open #winLobby,body.rooms-open #panelAnon,bo
 <div class="field" style="display:flex;flex-direction:column;gap:4px"><label for="email" style="font-size:20px">Courriel :</label><input id="email" type="email" autocomplete="email" placeholder="toi@exemple.com" spellcheck="false"></div>
 <div class="field" style="display:flex;flex-direction:column;gap:4px"><label for="pass" style="font-size:20px">Mot de passe :</label><input id="pass" type="password" autocomplete="current-password" placeholder="••••••"></div>
 <button class="submit" type="submit">SE CONNECTER</button>
-<div class="alinks"><button class="linkbtn" type="button" id="forgot">Mot de passe oublié ?</button><button class="linkbtn" type="button" id="signup">Créer un compte</button></div>
+<div class="alinks"><button class="linkbtn" type="button" id="signup">Créer un compte</button></div>
 </form>
 <div class="logged" id="logged" hidden>
 <div class="who"><span class="avatar" aria-hidden="true"><svg id="avAuth" viewBox="0 0 150 150"></svg></span>
@@ -978,6 +978,7 @@ body.rooms-open #winHome,body.rooms-open #winLobby,body.rooms-open #panelAnon,bo
 </div>
 <p class="status" id="aStatus" role="status" hidden></p>
 </div>
+<div id="anonActs" style="display:contents">
 <div class="acts">
 <button class="submit main" id="btnPlay" type="button">JOUER</button>
 <button class="submit" id="btnCreate" type="button">CRÉER UN SALON</button>
@@ -989,6 +990,7 @@ body.rooms-open #winHome,body.rooms-open #winLobby,body.rooms-open #panelAnon,bo
 <div class="coderow"><input id="code" placeholder="K7Q2" maxlength="6" autocomplete="off" spellcheck="false"><button class="mini" type="submit">ENTRER</button></div>
 </form>
 <p class="status" id="hStatus" role="status" hidden></p>
+</div>
 </div>
 </section>
 
@@ -1438,7 +1440,7 @@ body.rooms-open #winHome,body.rooms-open #winLobby,body.rooms-open #panelAnon,bo
   function setMode(m){
     mode=m;
     document.querySelectorAll('[data-mode]').forEach(function(b){b.setAttribute('aria-selected',String(b.getAttribute('data-mode')===m))});
-    var tr=vt(function(){$('panelAnon').hidden=m!=='anon';$('panelAuth').hidden=m!=='auth'});if(!tr)enter(m==='anon'?$('panelAnon'):$('panelAuth'),'swap');
+    var tr=vt(function(){$('panelAnon').hidden=m!=='anon';$('panelAuth').hidden=m!=='auth';$('anonActs').hidden=m!=='anon'});if(!tr)enter(m==='anon'?$('panelAnon'):$('panelAuth'),'swap');
     hush($('hStatus'));
     if(!wins.home.hidden){(m==='auth'&&!account?$('email'):nick).focus({preventScroll:true})}
   }
@@ -1469,11 +1471,6 @@ body.rooms-open #winHome,body.rooms-open #winLobby,body.rooms-open #panelAnon,bo
     },700);
   });
   $('logout').addEventListener('click',function(){account=null;$('logged').hidden=true;$('loginForm').hidden=false;say($('aStatus'),'Tu es déconnecté.');$('email').focus()});
-  $('forgot').addEventListener('click',function(){
-    var em=$('email').value.trim();
-    if(!EMAIL.test(em)){say($('aStatus'),'Entre ton courriel ci-dessus : on t\'enverra un lien pour changer ton mot de passe.',true);$('email').focus();return}
-    say($('aStatus'),'Si un compte existe pour '+em+', un lien de réinitialisation vient d\'être envoyé. (maquette)');
-  });
   $('signup').addEventListener('click',function(){
     var em=$('email').value.trim(),pw=$('pass').value;
     if(!EMAIL.test(em)||pw.length<6){say($('aStatus'),'Pour créer un compte, entre ton courriel et choisis un mot de passe d\'au moins 6 caractères, puis reclique ici.',true);(EMAIL.test(em)?$('pass'):$('email')).focus();return}
