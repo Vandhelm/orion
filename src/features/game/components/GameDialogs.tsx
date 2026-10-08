@@ -2,7 +2,16 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { useGame } from "../GameProvider";
-import { DEFAULT_MAX_PLAYERS, MAX_PLAYER_OPTIONS, ROOM_NAME_MAX_LENGTH, type Visibility } from "../rooms";
+import {
+  DEFAULT_MAX_PLAYERS,
+  DEFAULT_ROOM_LANGUAGE,
+  LANGUAGE_LABEL,
+  MAX_PLAYER_OPTIONS,
+  ROOM_LANGUAGES,
+  ROOM_NAME_MAX_LENGTH,
+  type RoomLanguage,
+  type Visibility,
+} from "../rooms";
 import { StatusMessage } from "./StatusMessage";
 import { WindowBar } from "./WindowBar";
 
@@ -86,6 +95,24 @@ function CreateRoomFields({ defaultName }: { defaultName: string }) {
           ))}
         </select>
       </div>
+      <div className="field flex items-center gap-2.5">
+        <label htmlFor="roomLanguage" style={{ fontSize: 20 }}>
+          Langue :
+        </label>
+        <select id="roomLanguage" name="language" className="input sel" defaultValue={DEFAULT_ROOM_LANGUAGE}>
+          {ROOM_LANGUAGES.map((code) => (
+            <option key={code} value={code}>
+              {LANGUAGE_LABEL[code]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <label className="vopt">
+        <input type="checkbox" name="bots" />
+        <span>
+          <b>Bots</b> Des bots complètent la grille s&apos;il manque des pilotes.
+        </span>
+      </label>
     </>
   );
 }
@@ -102,6 +129,8 @@ export function CreateRoomDialog() {
       name: String(data.get("roomName") ?? ""),
       visibility: String(data.get("visibility")) as Visibility,
       maxPlayers: Number(data.get("maxPlayers")),
+      language: String(data.get("language")) as RoomLanguage,
+      bots: data.get("bots") === "on",
     });
     if (!created) form.querySelector<HTMLInputElement>("[aria-invalid], #roomName")?.focus();
   }

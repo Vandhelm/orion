@@ -19,6 +19,8 @@ const room = (overrides: Partial<Room>): Room => ({
   players: 1,
   maxPlayers: 8,
   mode: "Grand Prix",
+  language: "fr",
+  bots: false,
   ...overrides,
 });
 
@@ -46,7 +48,7 @@ describe("codes de salon", () => {
 });
 
 describe("validateNewRoom", () => {
-  const input = { name: "Mon salon", visibility: "private" as const, maxPlayers: 6 };
+  const input = { name: "Mon salon", visibility: "private" as const, maxPlayers: 6, language: "fr" as const, bots: true };
 
   test("accepte un salon valide", () => {
     expect(validateNewRoom(input)).toBeNull();
@@ -58,9 +60,11 @@ describe("validateNewRoom", () => {
     expect(validateNewRoom({ ...input, name: "x".repeat(29) })).toContain("au plus");
   });
 
-  test("refuse une visibilité ou un nombre de places inventés", () => {
+  test("refuse une visibilité, un nombre de places, une langue ou des bots inventés", () => {
     expect(validateNewRoom({ ...input, visibility: "secret" as never })).toContain("qui peut entrer");
     expect(validateNewRoom({ ...input, maxPlayers: 99 })).toContain("places");
+    expect(validateNewRoom({ ...input, language: "xx" as never })).toContain("langue");
+    expect(validateNewRoom({ ...input, bots: "oui" as never })).toContain("bots");
   });
 });
 

@@ -2,7 +2,7 @@ import "server-only";
 import { and, asc, desc, eq, gt, lt, sql } from "drizzle-orm";
 import { room, roomInvite } from "@/db/schema";
 import { db } from "@/lib/db";
-import type { Room, Visibility } from "../rooms";
+import type { NewRoomInput, Room } from "../rooms";
 
 const ROOM_FIELDS = {
   id: room.id,
@@ -11,6 +11,8 @@ const ROOM_FIELDS = {
   players: room.players,
   maxPlayers: room.maxPlayers,
   mode: room.mode,
+  language: room.language,
+  bots: room.bots,
 };
 
 export async function listOpenPublicRooms(): Promise<Room[]> {
@@ -26,7 +28,7 @@ export async function findRoom(id: string): Promise<Room | null> {
   return found ?? null;
 }
 
-export type NewRoomRow = { id: string; name: string; visibility: Visibility; maxPlayers: number };
+export type NewRoomRow = NewRoomInput & { id: string };
 
 /** Insère le salon (son créateur occupe la première place). Renvoie null si le code est déjà pris. */
 export async function insertRoom(row: NewRoomRow): Promise<Room | null> {

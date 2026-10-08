@@ -1,7 +1,10 @@
 import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import {
+  DEFAULT_MAX_PLAYERS,
+  DEFAULT_ROOM_LANGUAGE,
   PRIVATE_ROOM_MESSAGE,
+  ROOM_NAME_MAX_LENGTH,
   canJoinWithCode,
   isFull,
   pickQuickPlayRoom,
@@ -70,12 +73,7 @@ export async function createRoom(input: NewRoomInput): Promise<Result<Room>> {
   const error = validateNewRoom(input);
   if (error) return fail(error);
   for (let attempt = 0; attempt < MAX_CODE_ATTEMPTS; attempt++) {
-    const created = await insertRoom({
-      id: randomRoomCode(),
-      name: input.name.trim(),
-      visibility: input.visibility,
-      maxPlayers: input.maxPlayers,
-    });
+    const created = await insertRoom({ ...input, id: randomRoomCode(), name: input.name.trim() });
     if (created) return ok(created);
   }
   return fail("Impossible de créer le salon pour le moment. Réessaie.");
@@ -89,7 +87,13 @@ export async function quickPlay(playerName: string): Promise<Result<{ room: Room
     const seated = await takeSeat(candidate.id);
     if (seated) return ok({ room: seated, host: false });
   }
-  const created = await createRoom({ name: `Salon de ${playerName}`.slice(0, 28), visibility: "public", maxPlayers: 8 });
+  const created = await createRoom({
+    name: `Salon de ${playerName}`.slice(0, ROOM_NAME_MAX_LENGTH),
+    visibility: "public",
+    maxPlayers: DEFAULT_MAX_PLAYERS,
+    language: DEFAULT_ROOM_LANGUAGE,
+    bots: false,
+  });
   return created.ok ? ok({ room: created.data, host: true }) : created;
 }
 

@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, pgEnum, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, check, index, integer, pgEnum, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 // Chemin relatif : le CLI de migration de Better Auth ne connaît pas l'alias @/.
-import { VISIBILITIES } from "../features/game/rooms";
+import { VISIBILITIES, type RoomLanguage } from "../features/game/rooms";
 
 /** Tables du jeu (Drizzle). Les tables de connexion (user, session…) sont gérées par Better Auth. */
 
@@ -17,6 +17,9 @@ export const room = pgTable(
     maxPlayers: integer("max_players").notNull(),
     visibility: roomVisibility("visibility").notNull(),
     mode: varchar("mode", { length: 32 }).notNull().default("Grand Prix"),
+    /** Code ISO 639-1 parmi ROOM_LANGUAGES (vérifié par validateNewRoom). */
+    language: varchar("language", { length: 2 }).$type<RoomLanguage>().notNull().default("fr"),
+    bots: boolean("bots").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [check("room_players_range", sql`${table.players} >= 0 AND ${table.players} <= ${table.maxPlayers}`)],

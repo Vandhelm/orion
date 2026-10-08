@@ -13,6 +13,24 @@ export const VISIBILITIES = ["public", "semi-public", "private"] as const;
 export type Visibility = (typeof VISIBILITIES)[number];
 export type RaceMode = "Grand Prix" | "Sprint" | "Contre-la-montre";
 
+/** Langue parlée dans le salon (code ISO 639-1). */
+export const ROOM_LANGUAGES = ["fr", "en", "es", "de", "it", "ja"] as const;
+export type RoomLanguage = (typeof ROOM_LANGUAGES)[number];
+export const DEFAULT_ROOM_LANGUAGE: RoomLanguage = "fr";
+
+export const LANGUAGE_LABEL: Record<RoomLanguage, string> = {
+  fr: "Français",
+  en: "Anglais",
+  es: "Espagnol",
+  de: "Allemand",
+  it: "Italien",
+  ja: "Japonais",
+};
+
+export function isRoomLanguage(value: unknown): value is RoomLanguage {
+  return ROOM_LANGUAGES.includes(value as RoomLanguage);
+}
+
 /** Salon tel que l'interface le voit. */
 export type Room = {
   id: string;
@@ -21,6 +39,9 @@ export type Room = {
   players: number;
   maxPlayers: number;
   mode: string;
+  language: RoomLanguage;
+  /** Des bots complètent la grille au départ. */
+  bots: boolean;
 };
 
 export type RandomSource = () => number;
@@ -108,6 +129,8 @@ export type NewRoomInput = {
   name: string;
   visibility: Visibility;
   maxPlayers: number;
+  language: RoomLanguage;
+  bots: boolean;
 };
 
 /** Message d'erreur, ou null si le salon peut être créé. Vérifié côté navigateur et côté serveur. */
@@ -117,6 +140,8 @@ export function validateNewRoom(input: NewRoomInput): string | null {
   if (name.length > ROOM_NAME_MAX_LENGTH) return `Le nom compte au plus ${ROOM_NAME_MAX_LENGTH} caractères.`;
   if (!isVisibility(input.visibility)) return "Choisis qui peut entrer.";
   if (!MAX_PLAYER_OPTIONS.includes(input.maxPlayers as (typeof MAX_PLAYER_OPTIONS)[number])) return "Nombre de places invalide.";
+  if (!isRoomLanguage(input.language)) return "Choisis la langue du salon.";
+  if (typeof input.bots !== "boolean") return "Indique si des bots complètent la grille.";
   return null;
 }
 

@@ -68,6 +68,8 @@ export async function createRoomAction(input: NewRoomInput): Promise<Result<Room
       name: String(input.name),
       visibility: input.visibility,
       maxPlayers: Number(input.maxPlayers),
+      language: input.language,
+      bots: input.bots === true,
     }),
   );
 }
