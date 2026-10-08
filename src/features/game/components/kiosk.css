@@ -1,0 +1,420 @@
+/*
+ * Page Salons : le kiosque (yatai), repris de la maquette apercu-kiosque.html.
+ * Encre et papier seulement (tokens figés en clair par .orion) ; les nuances viennent des trames.
+ * Toutes les mesures du kiosque sont en cqw : 100cqw = largeur du kiosque = 640 unités du dessin d'origine.
+ */
+
+.kiosk {
+  --k-ink: var(--foreground);
+  --k-paper: var(--background);
+  --k-serif: var(--font-shippori), "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --k-mono: var(--font-courier), "Courier New", monospace;
+  --page-h: max(100vh, 640px);
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: auto;
+  background: var(--k-ink);
+  color: var(--k-paper);
+  font-family: var(--k-mono);
+}
+@supports (height: 100dvh) {
+  .kiosk { --page-h: max(100dvh, 640px); }
+}
+.kiosk :focus-visible { outline: 2px dashed var(--k-paper); outline-offset: 4px; }
+
+/* ---------- La scène : la bande noire suit la hauteur du kiosque ---------- */
+.k-band {
+  position: relative;
+  min-height: var(--page-h);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 24px 0;
+  overflow: hidden;
+}
+
+/* plancher : bande blanche d'un bord à l'autre */
+.k-floor {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  height: 12px;
+  margin: 0 -24px 16px;
+  background: var(--k-paper);
+}
+
+.k-dust { position: absolute; z-index: 5; border-radius: 50%; background: var(--k-paper); }
+
+/* rayons tramés */
+.k-rays__dots, .k-rays__lines { position: absolute; inset: 0; }
+.k-rays__dots {
+  background-image: radial-gradient(var(--k-paper) 1px, transparent 1.3px);
+  background-size: 6px 6px;
+}
+.k-rays__lines {
+  background: repeating-conic-gradient(from 0deg at 50% 50%, var(--k-ink) 0deg 6deg, transparent 6deg 12deg);
+}
+
+/* ---------- Le kiosque ---------- */
+.yatai {
+  --line: 3px;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  container-type: inline-size;
+  /* aussi large que possible ; avec une seule rangée de pochettes, le stand tient dans l'écran */
+  width: min(100%, 1700px, calc((var(--page-h) - 56px) / 0.66));
+  margin: auto auto 0;
+}
+
+.yatai__rays {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 38%;
+  width: 115%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.yatai__roof { display: block; width: 100%; height: auto; }
+
+/* noren : les pans blancs entre les poteaux, chacun une case du code */
+.yatai__noren {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 0.6cqw;
+  margin: 0 15.6cqw 0 17.2cqw;
+  height: 4.7cqw;
+}
+.noren__in {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0 0 0 0.35em;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
+  background-color: var(--k-paper);
+  /* petit trait sous la case : on devine qu'on peut écrire */
+  background-image: linear-gradient(var(--k-ink), var(--k-ink));
+  background-repeat: no-repeat;
+  background-size: 30% 2px;
+  background-position: center calc(100% - 0.55cqw);
+  color: var(--k-ink);
+  caret-color: currentColor;
+  text-align: center;
+  text-transform: uppercase;
+  font: 700 2.6cqw/1 var(--k-mono);
+  letter-spacing: 0.35em;
+  cursor: text;
+}
+.noren__in::placeholder { color: var(--k-ink); opacity: 1; font: 800 3.1cqw/1 var(--k-serif); letter-spacing: 0; }
+.noren__in:hover,
+.noren__in:focus {
+  outline: none;
+  background-color: var(--k-ink);
+  background-image: linear-gradient(var(--k-paper), var(--k-paper));
+  color: var(--k-paper);
+  box-shadow: inset 0 0 0 2px var(--k-paper);
+}
+.noren__in:hover::placeholder { color: var(--k-paper); }
+.noren__in:focus::placeholder { color: transparent; }
+.noren__in[aria-invalid="true"] { box-shadow: inset 0 0 0 3px var(--k-ink), inset 0 0 0 5px var(--k-paper); }
+.yatai__noren.is-ok .noren__in { background-color: var(--k-ink); color: var(--k-paper); box-shadow: inset 0 0 0 2px var(--k-paper); }
+
+/* libellé sur la poutre du toit, juste au-dessus du noren */
+.yatai__codehint {
+  position: absolute;
+  z-index: 3;
+  left: 17.2cqw;
+  right: 15.6cqw;
+  top: 8.75cqw;
+  height: 1.3cqw;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  color: var(--k-ink);
+  font: 700 max(8px, 0.95cqw)/1 var(--k-mono);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.yatai__codehint [lang="ja"] { font-family: var(--k-serif); letter-spacing: 0.1em; }
+
+/* shoji (treillis de papier) */
+.yatai__shoji {
+  background-color: var(--k-paper);
+  background-image:
+    linear-gradient(var(--k-ink) 1.6px, transparent 1.6px),
+    linear-gradient(90deg, var(--k-ink) 1.6px, transparent 1.6px);
+  background-size: 10px 12px;
+  background-position: -1px -1px;
+  border: var(--line) solid var(--k-paper);
+}
+.yatai__shoji--out { position: absolute; z-index: 1; left: 8.1cqw; top: 15cqw; width: 6.6cqw; height: 12.8cqw; }
+.yatai__side {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 5.6cqw;
+}
+.yatai__shoji--in { width: 5cqw; height: 11.6cqw; }
+
+.yatai__lantern { position: absolute; z-index: 3; left: 5.9cqw; top: 10.1cqw; width: 8.75cqw; height: auto; }
+.yatai__lantern text { font-family: var(--k-serif); }
+
+/* corps : poteau, ouverture, poteau */
+.yatai__body { position: relative; z-index: 1; display: flex; margin: -4.7cqw 6.9cqw 0 15cqw; min-height: 27.7cqw; }
+.yatai__post { flex-shrink: 0; width: 1.9cqw; background: var(--k-ink); border: var(--line) solid var(--k-paper); }
+.yatai__opening { flex: 1; display: flex; flex-direction: column; min-width: 0; padding-top: 4.7cqw; background: var(--k-ink); }
+.yatai__row { flex: 1; display: flex; min-height: 0; }
+
+/* zone d'affichage : elle grandit avec son contenu */
+.yatai__window {
+  flex: 1;
+  min-width: 0;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 1cqw 1.2cqw;
+}
+
+.yatai__bowls { display: flex; justify-content: center; width: 100%; height: 1.9cqw; }
+.yatai__bowls svg { height: 100%; width: auto; display: block; }
+
+.yatai__counter { position: relative; z-index: 2; margin: 0 3cqw 0 10.9cqw; height: 1.9cqw; background: var(--k-paper); }
+.yatai__cart { position: relative; margin: 0 5cqw 0 13.1cqw; height: 9.4cqw; border: var(--line) solid var(--k-paper); border-top: 0; }
+.yatai__tiles { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.yatai__handles { position: absolute; right: 100%; top: 1.25cqw; width: 11.9cqw; height: 2.8cqw; border: var(--line) solid var(--k-paper); border-right: 0; }
+.yatai__wheel {
+  position: absolute;
+  top: calc(100% - 0.4cqw);
+  width: 2.8cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--k-ink);
+  border: var(--line) solid var(--k-paper);
+}
+.yatai__wheel--l { left: 3.6cqw; }
+.yatai__wheel--r { right: 3.6cqw; }
+.yatai__ground { height: 2.4cqw; }
+
+/* ---------- Enseigne de retour : pendue en haut de l'écran, toujours visible ---------- */
+.k-sign {
+  position: fixed;
+  z-index: 20;
+  top: 26px;
+  left: 20px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  background: var(--k-paper);
+  color: var(--k-ink);
+  border: 2px solid var(--k-paper);
+  outline: 1px solid var(--k-ink);
+  outline-offset: -5px;
+  box-shadow: 0 0 0 2px var(--k-ink);
+  font: 700 13px/1 var(--k-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.k-sign__jp { font: 800 18px/1 var(--k-serif); letter-spacing: 0.08em; }
+.k-sign::before,
+.k-sign::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 4px);
+  width: 2px;
+  height: 30px;
+  background: var(--k-paper);
+}
+.k-sign::before { left: 18%; }
+.k-sign::after { right: 18%; }
+.k-sign:hover { background: var(--k-ink); color: var(--k-paper); outline-color: var(--k-paper); }
+
+/* ---------- Ardoise : nombre de salons, recherche, actions ---------- */
+.k-board {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 10px 12px;
+  border: 4px double var(--k-paper);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.k-board__count { margin: 0; display: flex; align-items: baseline; gap: 10px; }
+.k-board__count [lang="ja"] { flex-shrink: 0; font: 800 16px var(--k-serif); letter-spacing: 0.1em; }
+.k-board__tools { display: flex; flex-wrap: wrap; gap: 8px; flex: 1 1 320px; justify-content: flex-end; }
+
+.k-input {
+  flex: 1 1 140px;
+  max-width: 260px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 2px solid var(--k-paper);
+  border-radius: 0;
+  background: var(--k-ink);
+  color: var(--k-paper);
+  font: 16px var(--k-mono);
+  appearance: none;
+}
+.k-input::placeholder { color: var(--k-paper); font-style: italic; opacity: 1; }
+.k-input:focus { outline: none; background: var(--k-paper); color: var(--k-ink); }
+.k-input:focus::placeholder { color: var(--k-ink); }
+
+.k-btn {
+  min-height: 40px;
+  min-width: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--k-paper);
+  border-radius: 0;
+  background: var(--k-ink);
+  color: var(--k-paper);
+  font: 700 13px var(--k-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.k-btn:hover { background: var(--k-paper); color: var(--k-ink); }
+.k-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* bouton « tampon » de la maquette */
+.k-btn--stamp {
+  background: var(--k-paper);
+  color: var(--k-ink);
+  box-shadow: 5px 5px 0 -2px var(--k-ink), 5px 5px 0 0 var(--k-paper);
+  transition: transform .1s steps(2), box-shadow .1s steps(2);
+}
+.k-btn--stamp:hover { background: var(--k-paper); color: var(--k-ink); transform: translate(2px, 2px); box-shadow: 3px 3px 0 -2px var(--k-ink), 3px 3px 0 0 var(--k-paper); }
+.k-btn--stamp:active { transform: translate(5px, 5px); box-shadow: none; }
+
+/* .orion préfixe pour passer devant les règles de .status de orion.css */
+.orion .kiosk .status { margin: 0; padding: 6px 10px; border: 2px dashed var(--k-paper); background: var(--k-ink); color: var(--k-paper); font: 13px var(--k-mono); letter-spacing: 0.06em; }
+.orion .kiosk .status.err { border-style: solid; background: var(--k-paper); color: var(--k-ink); }
+.orion .kiosk .status.err::before { content: "! "; color: inherit; }
+
+.k-empty { margin: 0 0 auto; padding: 28px 12px; text-align: center; font-size: 15px; line-height: 1.6; border: 2px dashed var(--k-paper); }
+.k-empty [lang="ja"] { display: block; font: 800 26px var(--k-serif); }
+
+.k-pages { display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; }
+
+/* ---------- Pochettes : une par salon, pendue sous le noren ---------- */
+.poch-grid {
+  --hang: 24px;
+  padding-top: var(--hang);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 300px));
+  gap: 14px;
+  justify-content: center;
+  align-items: start;
+  margin: 0 0 auto;
+  padding-inline: 0;
+  list-style: none;
+}
+@container (min-width: 460px) {
+  .poch-grid { grid-template-columns: repeat(4, minmax(0, 300px)); }
+}
+@container (max-width: 420px) {
+  .poch-grid { grid-template-columns: repeat(2, minmax(0, 272px)); gap: 12px; }
+}
+
+/* chaque pochette repose sur un carton blanc : sans lui, ses découpes disparaîtraient dans le noir */
+.poch {
+  --poch-accent: var(--pouch-1);
+  position: relative;
+  background: var(--k-paper);
+  padding: 5px;
+  border-radius: 3px;
+}
+.poch--2 { --poch-accent: var(--pouch-2); }
+.poch--3 { --poch-accent: var(--pouch-3); }
+.poch--4 { --poch-accent: var(--pouch-4); }
+/* corde */
+.poch::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: calc(100% - 5px);
+  width: 2px;
+  height: calc(var(--hang) + 5px);
+  transform: translateX(-50%);
+  background: var(--k-paper);
+}
+.poch__wrap { position: relative; filter: drop-shadow(0 16px 22px color-mix(in srgb, var(--k-ink) 22%, transparent)); }
+.poch svg { width: 100%; height: auto; display: block; }
+.poch__card { fill: var(--k-ink); }
+.poch__edge { fill: none; stroke: var(--poch-accent); stroke-width: 1.6; }
+.poch__accent { fill: var(--poch-accent); }
+.poch__panel { fill: var(--k-ink); opacity: .82; }
+.poch__paper { fill: var(--k-paper); }
+.poch__ink { fill: var(--k-ink); }
+.poch__dots { stroke: var(--k-paper); stroke-opacity: .5; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 0 7; }
+.poch__label { font: 700 18px var(--k-mono); letter-spacing: 1px; fill: var(--k-paper); stroke: var(--k-ink); stroke-width: 12px; paint-order: stroke; }
+.poch__value { font: 700 20px Georgia, serif; fill: var(--poch-accent); stroke: var(--k-ink); stroke-width: 12px; paint-order: stroke; }
+.poch__title { font: 700 15px var(--k-mono); letter-spacing: 3px; fill: var(--poch-accent); }
+
+/* soleil : le bouton pour rejoindre, centré à (150, 255) sur un dessin de 300 × 660 */
+.poch__join {
+  position: absolute;
+  left: 10.667%;
+  top: 20.758%;
+  width: 78.667%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+.poch__join:disabled { cursor: not-allowed; }
+.poch__join:focus-visible { outline-offset: -10%; }
+.poch__join .rays, .poch__join .disc { transform-box: view-box; transform-origin: 50% 50%; transition: transform .5s ease; }
+.poch__join:hover:not(:disabled) .rays, .poch__join:focus-visible .rays { transform: rotate(22.5deg) scale(1.05); }
+.poch__join:hover:not(:disabled) .disc { transform: scale(1.06); }
+.poch__join:active:not(:disabled) .disc { transform: scale(.94); }
+.poch__jp { font: 700 26px var(--k-serif); fill: var(--k-ink); }
+.poch__cta { font: 700 13px Georgia, serif; fill: var(--k-ink); }
+
+/* ---------- Téléphone ---------- */
+@media (max-width: 760px) {
+  .k-band { min-height: 100vh; padding: 88px 8px 0; }
+  .k-floor { margin: 0 -8px 16px; height: 10px; }
+  .yatai { width: 100%; }
+  .yatai__body { min-height: 44.7cqw; }
+  .yatai__codehint {
+    top: auto;
+    bottom: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    height: auto;
+    color: var(--k-paper);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
+  .k-sign { top: 20px; left: 12px; min-height: 40px; padding: 0 12px; font-size: 12px; }
+  .k-sign::before, .k-sign::after { height: 24px; }
+  .k-board__tools { justify-content: stretch; }
+  .k-input { max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k-btn--stamp, .poch__join .rays, .poch__join .disc { transition: none; }
+}

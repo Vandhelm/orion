@@ -35,11 +35,8 @@
 .orion .input { font-family:var(--font-vt323),monospace;font-size:22px;color:var(--color-neutral-950);background:var(--color-white);border:2px solid var(--color-neutral-950);padding:6px 10px;outline:none;min-width:0 }
 .orion .input:focus { box-shadow:3px 3px 0 var(--color-cyan-400) }
 .orion .sel { padding:4px 8px }
-.orion .rtools { display:flex;gap:10px }
-.orion .rtools .input { flex:1 }
-.orion .pips { display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;max-width:210px }
-.orion .pips i, .orion .seats i { width:10px;height:10px;border:2px solid var(--color-neutral-950);background:var(--color-white) }
-.orion .pips i.on, .orion .seats i.on { background:var(--color-neutral-950) }
+.orion .seats i { width:10px;height:10px;border:2px solid var(--color-neutral-950);background:var(--color-white) }
+.orion .seats i.on { background:var(--color-neutral-950) }
 .orion .seats { display:flex;flex-wrap:wrap;gap:6px;margin-top:-8px }
 .orion .seats i { width:22px;height:22px }
 .orion .seats i.me { background:var(--color-cyan-400) }
@@ -258,8 +255,8 @@ html:has(.orion), .orion { background:var(--blush) !important;color:var(--blue) 
 .orion .sep { border-top:2px dashed var(--red) !important }
 .orion .status { font-family:var(--font-space-mono),monospace;font-size:12px !important;border:2px solid var(--blue) !important;background:var(--color-white) !important;color:var(--blue) !important }
 .orion .status.err { background:var(--blue) !important;color:var(--color-white) !important }
-.orion .pips i, .orion .seats i { border-color:var(--blue) !important;background:var(--color-white) }
-.orion .pips i.on, .orion .seats i.on { background:var(--blue) !important }
+.orion .seats i { border-color:var(--blue) !important;background:var(--color-white) }
+.orion .seats i.on { background:var(--blue) !important }
 .orion .seats i.me { background:var(--red) !important }
 .orion .lname { font-family:var(--font-krona-one),sans-serif !important;font-size:14px !important;color:var(--red) }
 .orion .lvis, .orion .lnote { font-size:11px !important;color:var(--blue) }
@@ -350,7 +347,6 @@ html:has(.orion), .orion { background:var(--blush) !important;color:var(--blue) 
 .orion .sec { display:inline-block;background:var(--color-neutral-950);color:var(--color-white) !important;padding:4px 10px }
 .orion .tagline { font-style:italic }
 .orion .status.err::before { color:var(--color-red-600) !important }
-.orion .pips i.on { background:var(--color-neutral-950) !important }
 .orion { --red:var(--color-red-600);--navy:var(--color-blue-900) }
 .orion .big span { background:var(--navy) !important;color:var(--color-white) !important }
 .orion .redblock .login { box-shadow:8px 8px 0 var(--navy) !important }
@@ -475,151 +471,16 @@ html:has(.orion), .orion { background:var(--blush) !important;color:var(--blue) 
   .orion .redblock .login { width:100% !important;max-width:440px }
   .orion .mtabs { max-width:440px }
 }
-.orion .roomsPage { position:fixed;inset:0;z-index:40;overflow:auto;background-color:var(--color-white);
-  background-image:radial-gradient(color-mix(in srgb, var(--color-neutral-950) 14%, transparent) 1.4px,transparent 1.8px);background-size:20px 20px;color:var(--color-neutral-950);font-family:var(--font-space-mono),monospace }
-.orion .roomsPage[hidden] { display:none !important }
-.orion .rp-wrap { max-width:1060px;margin:0 auto;padding:28px 20px 40px }
-.orion .rp-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(5,minmax(150px,auto));
-  border:6px solid var(--color-neutral-950);background:var(--color-neutral-950);gap:3px;box-shadow:10px 10px 0 var(--color-neutral-950) }
-.orion .cell { position:relative;background:var(--color-white);border:0;padding:12px 12px 10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0;font-family:inherit;color:var(--color-neutral-950) }
-.orion .cell .num { position:absolute;top:8px;right:8px;background:var(--color-neutral-950);color:var(--color-white);font-family:var(--font-krona-one),sans-serif;font-size:13px;line-height:1;padding:6px 7px }
-.orion .cell .pic { width:64%;max-width:120px;aspect-ratio:1;margin:4px auto 0 }
-.orion .cell .pic svg { width:100%;height:100% }
-.orion .cell .cn { font-family:var(--font-krona-one),sans-serif;font-size:11.5px;line-height:1.25;margin-top:auto;word-break:break-word;padding-right:4px }
-.orion .cell .cm { font-size:10.5px;line-height:1.3;color:var(--color-neutral-800) }
-.orion .cell .pips { max-width:none }
-.orion .cell .pips i { width:8px;height:8px;border-width:1.5px }
-.orion .cell:hover { background:var(--color-neutral-100) }
-.orion .cell:hover .pic svg { transform:rotate(-4deg) scale(1.04) }
-.orion .cell .pic svg { transition:transform .2s }
-.orion .cell[aria-pressed=true] { background:var(--color-neutral-950);color:var(--color-white) }
-.orion .cell[aria-pressed=true] .cm { color:var(--color-neutral-200) }
-.orion .cell[aria-pressed=true] .num { background:var(--color-red-600);color:var(--color-white) }
-.orion .cell[aria-pressed=true] .pic svg { filter:invert(1) }
-.orion .cell[aria-pressed=true] .pips i { border-color:var(--color-white) !important;background:transparent }
-.orion .cell[aria-pressed=true] .pips i.on { background:var(--color-white) !important }
-.orion .cell:focus-visible { outline:3px solid var(--color-red-600);outline-offset:-6px }
-.orion .cell.more { align-items:center;justify-content:center;text-align:center;background:var(--color-white) }
-.orion .cell.more .cn { margin:0 }
-.orion .rp-center { grid-column:2 / 4;grid-row:2 / 5;background:var(--color-white);display:flex;flex-direction:column;padding:18px 20px;gap:14px;min-width:0 }
-.orion .rc-head { display:flex;justify-content:space-between;gap:14px;align-items:flex-start;border-bottom:3px solid var(--color-neutral-950);padding-bottom:12px }
-.orion .rc-title { display:flex;gap:10px;align-items:flex-start }
-.orion .rc-title h2 { margin:0;font-family:var(--font-krona-one),sans-serif;font-weight:400;font-size:24px;line-height:1.1;outline:none }
-.orion .rc-kat { writing-mode:vertical-rl;font-family:var(--font-noto-jp),'Hiragino Sans',sans-serif;font-weight:300;font-size:20px;border:2px solid var(--color-neutral-950);padding:6px 3px;line-height:1 }
-.orion .rc-side { display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:0 }
-.orion .rc-count { margin:0;font-size:11px;text-align:right }
-.orion .rc-side .rtools { display:flex;gap:6px }
-.orion .rc-side .input { width:150px;font-size:13px !important;padding:6px 8px !important }
-.orion .rc-detail { flex:1;display:grid;grid-template-columns:42% 1fr;gap:16px;align-items:center;min-height:200px }
-.orion .rd-pic { position:relative;aspect-ratio:1;border-radius:50%;background:var(--color-white);border:4px solid var(--color-neutral-950);overflow:hidden;
-  background-image:repeating-radial-gradient(circle at 50% 50%,transparent 0 8px,color-mix(in srgb, var(--color-red-600) 85%, transparent) 8px 10px) }
-.orion .rd-pic svg { position:absolute;inset:14%;width:72%;height:72% }
-.orion .rd-name { margin:0 0 6px;font-family:var(--font-krona-one),sans-serif;font-weight:400;font-size:19px;line-height:1.2;word-break:break-word }
-.orion .rd-tag { display:inline-block;background:var(--color-neutral-950);color:var(--color-white);font-size:10px;letter-spacing:.1em;padding:3px 8px;text-transform:uppercase;margin-bottom:10px }
-.orion .rd-list { margin:0 0 10px;padding:0;list-style:none;font-size:12px;border-top:2px solid var(--color-neutral-950) }
-.orion .rd-list li { display:flex;justify-content:space-between;border-bottom:1px dashed var(--color-neutral-950);padding:5px 0 }
-.orion .rd-list b { font-weight:700 }
-.orion .rd-seats { display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px }
-.orion .rd-seats i { width:14px;height:14px;border:2px solid var(--color-neutral-950);background:var(--color-white) }
-.orion .rd-seats i.on { background:var(--color-neutral-950) }
-.orion .rd-note { font-size:10px;color:var(--color-neutral-600);margin:0 0 10px }
-.orion .rd-join { width:100%;min-height:46px;border:2px solid var(--color-neutral-950);background:var(--color-red-600);color:var(--color-white);font-family:var(--font-krona-one),sans-serif;font-size:12px;letter-spacing:.06em;cursor:pointer;box-shadow:4px 4px 0 var(--color-neutral-950) }
-.orion .rd-join:hover { background:var(--color-neutral-950) }
-.orion .rd-join:active { transform:translate(2px,2px);box-shadow:2px 2px 0 var(--color-neutral-950) }
-.orion .rd-join:disabled { background:var(--color-white);color:var(--color-neutral-950);cursor:not-allowed;box-shadow:none }
-.orion .rd-empty { grid-column:1 / -1;text-align:center;font-size:13px;line-height:1.5 }
-.orion .rc-foot { display:flex;flex-direction:column;gap:10px;border-top:3px solid var(--color-neutral-950);padding-top:12px }
-.orion .rc-btns { display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap }
-.orion .roomsPage .mini { background:var(--color-white) !important;color:var(--color-neutral-950) !important;border:2px solid var(--color-neutral-950) !important;font-family:var(--font-krona-one),sans-serif !important;font-size:9.5px !important;padding:0 12px;min-height:36px }
-.orion .roomsPage .mini:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
-.orion .roomsPage .status { font-size:12px !important }
-@media (max-width:860px) {
-  .orion .rp-grid { grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:none;grid-auto-rows:minmax(140px,auto) }
-  .orion .rp-center { grid-column:1 / -1 !important;grid-row:1 !important }
-  .orion .cell { grid-column:auto !important;grid-row:auto !important }
-}
-@media (max-width:560px) {
-  .orion .rp-wrap { padding:12px 10px 28px }
-  .orion .rp-grid { grid-template-columns:repeat(2,minmax(0,1fr));border-width:4px;box-shadow:6px 6px 0 var(--color-neutral-950) }
-  .orion .rc-head { flex-direction:column }
-  .orion .rc-side { align-items:stretch;width:100% }
-  .orion .rc-count { text-align:left }
-  .orion .rc-side .input { width:auto;flex:1 }
-  .orion .rc-detail { grid-template-columns:1fr }
-  .orion .rd-pic { max-width:180px;width:100%;margin:0 auto }
-}
 .orion { --pink:var(--color-pink-500);--cyan:var(--color-sky-400);--yellow:var(--color-yellow-300);--lime:var(--color-lime-400) }
-.orion .cell .sfx2 { position:absolute;left:10px;top:10px;font-family:var(--font-noto-jp),'Hiragino Sans',sans-serif;font-weight:900;font-size:13px;line-height:1;writing-mode:vertical-rl;color:var(--color-neutral-950);
-  -webkit-text-stroke:3px var(--color-white);paint-order:stroke fill;transform:rotate(-6deg) }
-.orion .cell[aria-pressed=true] .pic svg { filter:none }
-.orion .cell[aria-pressed=true] { background-color:var(--color-neutral-950);background-image:radial-gradient(color-mix(in srgb, var(--color-white) 18%, transparent) 1.2px,transparent 1.6px);background-size:6px 6px }
-.orion .cell[aria-pressed=true] .pic { background:var(--color-white);border-radius:50%;border:3px solid var(--yellow);padding:6% }
-.orion .cell[aria-pressed=true] .num { background:var(--pink);color:var(--color-neutral-950) }
-.orion .cell[aria-pressed=true] .sfx2 { color:var(--yellow);-webkit-text-stroke:3px var(--color-neutral-950) }
-.orion .cell:hover { background:var(--color-yellow-100) }
-.orion .rd-pic { border-color:var(--color-neutral-950) !important;background-color:var(--yellow) !important;
-  background-image:repeating-conic-gradient(from 0deg at 50% 50%,var(--color-white) 0 6deg,transparent 6deg 15deg) !important }
-.orion .rd-bubble { position:absolute;right:-2%;top:2%;background:var(--color-white);border:3px solid var(--color-neutral-950);border-radius:50%;padding:8px 10px;font-family:var(--font-noto-jp),'Hiragino Sans',sans-serif;font-weight:900;font-size:16px;line-height:1;transform:rotate(8deg);box-shadow:3px 3px 0 var(--pink) }
-.orion .rd-pic { overflow:visible !important }
-.orion .rd-tag { background:var(--pink) !important;color:var(--color-neutral-950) !important;border:2px solid var(--color-neutral-950) }
-.orion .rd-join { background:var(--pink) !important;color:var(--color-neutral-950) !important }
-.orion .rd-join:hover { background:var(--color-neutral-950) !important;color:var(--color-white) !important }
-.orion .rd-seats i.on { background:var(--color-neutral-950) }
-.orion .rc-kat { background:var(--cyan);display:flex;align-items:center;justify-content:center;width:34px;min-height:60px;padding:6px 0 !important;box-sizing:border-box }
-.orion .rc-title h2 { text-shadow:2px 2px 0 var(--yellow) }
-.orion .rp-grid { box-shadow:10px 10px 0 var(--pink) !important;border-color:var(--color-neutral-950) }
-.orion .cell .num { background:var(--color-neutral-950) }
-.orion .cell[aria-pressed=true]:hover { background-color:var(--color-neutral-950) !important }
-.orion .rc-kat { font-size:16px !important;min-height:68px !important;line-height:1.1 !important }
-.orion .rp-grid { grid-template-rows:none;box-shadow:10px 10px 0 var(--color-neutral-950) !important }
-.orion .cell.more { background:var(--color-white) }
-.orion .cell.more .plus { font-family:var(--font-krona-one),sans-serif;font-size:26px;color:var(--color-red-600) }
-.orion .cell.more .cn { font-size:10px;text-align:center }
-.orion .cell:hover { background:var(--color-neutral-100) !important }
-.orion .cell[aria-pressed=true], .orion .cell[aria-pressed=true]:hover { background-color:var(--color-neutral-950) !important;background-image:radial-gradient(color-mix(in srgb, var(--color-white) 16%, transparent) 1.2px,transparent 1.6px);background-size:6px 6px }
-.orion .cell[aria-pressed=true] .pic { border-color:var(--color-red-600) !important }
-.orion .cell[aria-pressed=true] .num { background:var(--color-red-600) !important;color:var(--color-white) !important }
-.orion .cell[aria-pressed=true] .sfx2 { color:var(--color-white) !important;-webkit-text-stroke:3px var(--color-neutral-950) }
-.orion .rd-pic { background-color:var(--color-white) !important;background-image:repeating-conic-gradient(from 3deg at 50% 50%,var(--color-red-600) 0 7deg,var(--color-white) 7deg 18deg) !important }
-.orion .rd-bubble { box-shadow:3px 3px 0 var(--color-blue-900) !important }
-.orion .rd-tag { background:var(--color-neutral-950) !important;color:var(--color-white) !important;border:0 }
-.orion .rd-join { background:var(--color-red-600) !important;color:var(--color-white) !important }
-.orion .rd-join:hover { background:var(--color-neutral-950) !important }
-.orion .rc-kat { background:linear-gradient(180deg,var(--color-blue-900),var(--color-blue-600)) !important;color:var(--color-white);border-color:var(--color-neutral-950) !important }
-.orion .rc-title h2 { text-shadow:none !important }
-.orion .cell .pic { display:flex;align-items:center;justify-content:center }
-@media (max-width:860px) {
-  .orion .rp-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important;grid-template-rows:none !important;grid-auto-rows:minmax(150px,auto) }
-  .orion .rp-center { grid-column:1 / -1 !important;grid-row:auto !important;order:-1 }
-  .orion .cell { grid-column:auto !important;grid-row:auto !important }
-}
-.orion .cell[aria-pressed=true], .orion .cell[aria-pressed=true]:hover { background:var(--color-white) !important;background-image:none !important;color:var(--color-neutral-950) !important;box-shadow:inset 0 0 0 5px var(--color-red-600) }
-.orion .cell[aria-pressed=true] .cm { color:var(--color-neutral-800) !important }
-.orion .cell[aria-pressed=true] .pic { background:none !important;border:0 !important;padding:0 !important;border-radius:0 }
-.orion .cell[aria-pressed=true] .pips i { border-color:var(--color-neutral-950) !important;background:var(--color-white) }
-.orion .cell[aria-pressed=true] .pips i.on { background:var(--color-neutral-950) !important }
-.orion .cell[aria-pressed=true] .sfx2 { color:var(--color-red-600) !important;-webkit-text-stroke:3px var(--color-white) }
-.orion .cell[aria-pressed=true]::after { content:"◀ CHOISI";position:absolute;right:10px;bottom:10px;font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--color-red-600) }
-@media (max-width:860px) {
-  .orion .rp-grid > .cell:nth-child(even):last-child { grid-column:1 / -1 !important }
-}
 html:has(.orion) { scroll-behavior:smooth }
 .orion { --ease:cubic-bezier(.22,.8,.24,1) }
-.orion button, .orion .input, .orion .field input, .orion .cell, .orion .stab, .orion .mtab { transition:background-color .22s ease,color .22s ease,border-color .22s ease,box-shadow .25s var(--ease),transform .2s var(--ease),filter .25s ease }
-.orion .submit:active, .orion .mini:active, .orion .rd-join:active, .orion .mtab:active { transform:translateY(1px) scale(.985) }
-.orion .cell:hover:not([aria-pressed=true]) { transform:translateY(-2px) }
-.orion .cell:active { transform:translateY(0) scale(.99) }
+.orion button, .orion .input, .orion .field input, .orion .stab, .orion .mtab { transition:background-color .22s ease,color .22s ease,border-color .22s ease,box-shadow .25s var(--ease),transform .2s var(--ease),filter .25s ease }
+.orion .submit:active, .orion .mini:active, .orion .mtab:active { transform:translateY(1px) scale(.985) }
 .orion .enter { animation:winIn .45s var(--ease) both }
 @keyframes winIn {from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
-.orion .swap { animation:swapIn .35s var(--ease) both }
-@keyframes swapIn {from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
 .orion .pageIn { animation:pageIn .38s var(--ease) both }
-.orion .pageIn .rp-grid { animation:gridIn .5s var(--ease) both }
 @keyframes pageIn {from{opacity:0}to{opacity:1}}
-@keyframes gridIn {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes pageOut {to{opacity:0}}
-.orion .cellIn { animation:cellIn .42s var(--ease) both;animation-delay:var(--d,0ms) }
-@keyframes cellIn {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .orion .status:not([hidden]) { animation:statusIn .3s var(--ease) both }
 @keyframes statusIn {from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .orion .seats i.pop { animation:seatPop .4s var(--ease) both }
@@ -628,28 +489,17 @@ html:has(.orion) { scroll-behavior:smooth }
 .orion dialog.mdlg[open]::backdrop { animation:bdIn .3s ease both }
 @keyframes dlgIn {from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes bdIn {from{opacity:0}to{opacity:1}}
-.orion .rd-bubble { animation:bob 3.2s ease-in-out infinite }
-@keyframes bob {0%,100%{transform:rotate(8deg) translateY(0)}50%{transform:rotate(6deg) translateY(-4px)}}
-.orion .rd-pic { transition:transform .4s var(--ease) }
-.orion .rd-pic:hover { transform:rotate(-4deg) }
 @media (prefers-reduced-motion:reduce) {
-  .orion .enter, .orion .swap, .orion .pageIn, .orion .pageIn .rp-grid, .orion .cellIn, .orion .status:not([hidden]), .orion .seats i.pop, .orion dialog.mdlg[open], .orion dialog.mdlg[open]::backdrop, .orion .rd-bubble { animation:none !important }
+  .orion .enter, .orion .pageIn, .orion .status:not([hidden]), .orion .seats i.pop, .orion dialog.mdlg[open], .orion dialog.mdlg[open]::backdrop { animation:none !important }
   html:has(.orion) { scroll-behavior:auto }
 }
 .orion { --soft:cubic-bezier(.16,1,.3,1) }
-.orion button, .orion .input, .orion .field input, .orion .cell, .orion .stab, .orion .mtab { transition:background-color .35s var(--soft),color .35s var(--soft),border-color .35s var(--soft),box-shadow .45s var(--soft),transform .45s var(--soft),filter .4s var(--soft) !important }
-.orion .submit:active, .orion .mini:active, .orion .rd-join:active, .orion .mtab:active { transform:scale(.97) !important;transition-duration:.12s !important }
-.orion .cell:hover:not([aria-pressed=true]) { transform:translateY(-3px) }
+.orion button, .orion .input, .orion .field input, .orion .stab, .orion .mtab { transition:background-color .35s var(--soft),color .35s var(--soft),border-color .35s var(--soft),box-shadow .45s var(--soft),transform .45s var(--soft),filter .4s var(--soft) !important }
+.orion .submit:active, .orion .mini:active, .orion .mtab:active { transform:scale(.97) !important;transition-duration:.12s !important }
 .orion .redblock .submit:hover, .orion .redblock .submit.main:hover { transform:translateY(-1px) }
 .orion .enter { animation:winIn .7s var(--soft) both }
 @keyframes winIn {from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-.orion .swap { animation:swapIn .6s var(--soft) both }
-@keyframes swapIn {from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .orion .pageIn { animation:pageIn .5s var(--soft) both }
-.orion .pageIn .rp-grid { animation:gridIn .8s var(--soft) both }
-@keyframes gridIn {from{opacity:0;transform:translateY(24px) scale(.985)}to{opacity:1;transform:none}}
-.orion .cellIn { animation:cellIn .8s var(--soft) both;animation-delay:calc(var(--d,0ms) + 120ms) }
-@keyframes cellIn {from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
 .orion .status:not([hidden]) { animation:statusIn .55s var(--soft) both }
 @keyframes statusIn {from{opacity:0;transform:translateY(-8px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0)}}
 .orion .seats i.pop { animation:seatPop .6s var(--soft) both }
@@ -657,7 +507,6 @@ html:has(.orion) { scroll-behavior:smooth }
 .orion dialog.mdlg[open] { animation:dlgIn .6s var(--soft) both }
 .orion dialog.mdlg[open]::backdrop { animation:bdIn .5s ease both }
 @keyframes dlgIn {from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
-.orion .rd-bubble { animation:bob 4s ease-in-out infinite }
 .orion #winHome, .orion #winLobby { view-transition-name:game }
 .orion.rooms-open #winHome, .orion.rooms-open #winLobby, .orion.rooms-open #panelAnon, .orion.rooms-open #panelAuth { view-transition-name:none }
 .orion #panelAnon, .orion #panelAuth { view-transition-name:panel }
@@ -671,7 +520,6 @@ html:has(.orion) { scroll-behavior:smooth }
 ::view-transition-group(salons) { animation-duration:.75s }
 ::view-transition-old(salons) { animation:vtOut .2s ease both }
 ::view-transition-new(salons) { height:100%;object-fit:none;object-position:50% 0;animation:vtIn .45s .1s var(--soft) both }
-::view-transition-group(roompic) { animation-duration:.7s }
 @keyframes vtOut {to{opacity:0}}
 @keyframes vtIn {from{opacity:0}}
 @media (prefers-reduced-motion:reduce) {

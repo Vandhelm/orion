@@ -52,6 +52,11 @@
   --color-illustration-2: var(--illustration-2);
   --color-illustration-3: var(--illustration-3);
 
+  --color-pouch-1: var(--pouch-1);
+  --color-pouch-2: var(--pouch-2);
+  --color-pouch-3: var(--pouch-3);
+  --color-pouch-4: var(--pouch-4);
+
   --font-sans: var(--font-silkscreen);
   --font-mono: var(--font-vt323);
 }
@@ -67,6 +72,12 @@
   --illustration-1: var(--color-cyan-400);
   --illustration-2: var(--color-red-600);
   --illustration-3: var(--color-orange-500);
+
+  /* Liserés des pochettes de salon (kiosque) : identiques dans les deux thèmes. */
+  --pouch-1: var(--color-pink-500);
+  --pouch-2: var(--color-sky-400);
+  --pouch-3: var(--color-lime-300);
+  --pouch-4: var(--color-orange-500);
 }
 
 /* Sombre : inversion encre / papier, les couleurs vives restent identiques. */

@@ -88,10 +88,8 @@ type GameContextValue = GameRefs & {
   setRoomsQuery: (query: string) => void;
   roomsPageIndex: number;
   setRoomsPageIndex: (page: number) => void;
-  selectedRoomId: string | null;
-  setSelectedRoomId: (id: string | null) => void;
   quickPlay: () => void;
-  joinWithCode: (rawCode: string) => Promise<boolean>;
+  joinWithCode: (rawCode: string, area?: StatusArea) => Promise<boolean>;
   joinRoom: (room: Room, area: StatusArea) => void;
   createInvitationLink: () => Promise<string | null>;
   openCreateRoom: (area: StatusArea) => void;
@@ -159,7 +157,6 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, share
   const [dialog, setDialog] = useState<Dialog>(null);
   const [roomsQuery, setRoomsQuery] = useState("");
   const [roomsPageIndex, setRoomsPageIndex] = useState(0);
-  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
   const playerName = mode === "auth" && account ? account.name : nickname.trim();
 
@@ -357,16 +354,16 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, share
   }
 
   /** Renvoie false seulement si le code est refusé : le formulaire remet alors le focus sur son champ. */
-  async function joinWithCode(rawCode: string): Promise<boolean> {
-    if (busy || !checkPlayer("home")) return true;
+  async function joinWithCode(rawCode: string, area: StatusArea = "home"): Promise<boolean> {
+    if (busy || !checkPlayer(area)) return true;
     const check = validateJoinCode(rawCode);
     if ("error" in check) {
-      say("home", check.error, true);
+      say(area, check.error, true);
       return false;
     }
-    const room = await runAction("home", findRoomByCodeAction(check.code));
+    const room = await runAction(area, findRoomByCodeAction(check.code));
     if (!room) return false;
-    await tryJoin(room, "home");
+    await tryJoin(room, area);
     return true;
   }
 
@@ -471,8 +468,6 @@ export function GameProvider({ initialAccount, socialSignInFailed = false, share
     setRoomsQuery,
     roomsPageIndex,
     setRoomsPageIndex,
-    selectedRoomId,
-    setSelectedRoomId,
     quickPlay,
     joinWithCode,
     joinRoom,

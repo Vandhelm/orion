@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import {
-  layoutRoomGrid,
   listOpenPublicRooms,
   normalizeRoomCode,
   paginateRooms,
@@ -95,32 +94,19 @@ describe("listOpenPublicRooms", () => {
   });
 });
 
-describe("grille des salons", () => {
-  test("paginateRooms garde 16 cases sur une seule page", () => {
-    const list = Array.from({ length: 16 }, (_, i) => room({ id: String(i) }));
-    expect(paginateRooms(list, 0)).toMatchObject({ pageCount: 1, perPage: 16 });
+describe("paginateRooms", () => {
+  const list = Array.from({ length: 30 }, (_, i) => room({ id: String(i) }));
+
+  test("découpe la liste en pages de 12", () => {
+    expect(paginateRooms(list.slice(0, 12), 0)).toMatchObject({ pageCount: 1, page: 0 });
+    const last = paginateRooms(list, 2);
+    expect(last).toMatchObject({ pageCount: 3, page: 2 });
+    expect(last.shown.map((r) => r.id)).toEqual(["24", "25", "26", "27", "28", "29"]);
   });
 
-  test("paginateRooms réserve une case « suite » au-delà de 16", () => {
-    const list = Array.from({ length: 20 }, (_, i) => room({ id: String(i) }));
-    const second = paginateRooms(list, 1);
-    expect(second).toMatchObject({ pageCount: 2, perPage: 15, page: 1 });
-    expect(second.shown).toHaveLength(5);
+  test("revient à la première page hors limites, et garde une page quand la liste est vide", () => {
     expect(paginateRooms(list, 5).page).toBe(0);
-  });
-
-  test("layoutRoomGrid place les cases autour du centre, dans le sens horaire", () => {
-    const layout = layoutRoomGrid(4);
-    expect(layout.slots).toEqual([
-      { gridRow: "1 / 2", gridColumn: "1 / 13" },
-      { gridRow: "2 / 14", gridColumn: "10 / 13" },
-      { gridRow: "14 / 15", gridColumn: "1 / 13" },
-      { gridRow: "2 / 14", gridColumn: "1 / 4" },
-    ]);
-    expect(layout.center).toEqual({ gridRow: "2 / 14", gridColumn: "4 / 10" });
-  });
-
-  test("layoutRoomGrid sans case du haut commence le centre à la ligne 1", () => {
-    expect(layoutRoomGrid(0).center).toEqual({ gridRow: "1 / 13", gridColumn: "1 / 13" });
+    expect(paginateRooms(list, -1).page).toBe(0);
+    expect(paginateRooms([], 0)).toMatchObject({ shown: [], page: 0, pageCount: 1 });
   });
 });

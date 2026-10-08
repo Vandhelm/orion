@@ -3,7 +3,7 @@ import { CreateRoomDialog } from "@/features/game/components/GameDialogs";
 import { GameWindow } from "@/features/game/components/GameWindow";
 import { LobbyWindow } from "@/features/game/components/LobbyWindow";
 import { MobileTabs, SideTabs } from "@/features/game/components/ModeTabs";
-import { RoomsPage } from "@/features/game/components/RoomsPage";
+import { RoomsKiosk } from "@/features/game/components/RoomsKiosk";
 import { ReplayProvider } from "../replay-context";
 import { Backband } from "./Backband";
 import { Hero, HowToPlay, Sun } from "./HomeSections";
@@ -55,7 +55,7 @@ export function OrionHome({ initialAccount, socialSignInFailed, sharedLink }: Or
               </div>
             </div>
           </div>
-          <RoomsPage />
+          <RoomsKiosk />
           <CreateRoomDialog />
         </GameShell>
       </GameProvider>

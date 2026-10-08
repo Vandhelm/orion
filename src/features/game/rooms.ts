@@ -161,69 +161,15 @@ export function listOpenPublicRooms(rooms: readonly Room[], query: string): Room
   );
 }
 
-export type RaceInfo = { laps: number; currentLap: number };
+/* ---------- Pochettes du kiosque ---------- */
 
-/** Infos de course de démonstration, stables pour un même salon (dérivées du nom). */
-export function raceInfo(room: Room): RaceInfo {
-  const seed = room.name.length;
-  const laps = [3, 5, 7, 10][seed % 4];
-  return { laps, currentLap: room.players > 3 ? (seed % laps) + 1 : 0 };
-}
+export const ROOMS_PER_PAGE = 12;
 
-/* ---------- Grille de la page Salons ---------- */
+export type RoomPage = { shown: Room[]; page: number; pageCount: number };
 
-export const CELLS_PER_PAGE = 16;
-
-export type RoomPage = { shown: Room[]; page: number; pageCount: number; perPage: number };
-
-/** Au-delà de 16 salons, une case « suite » prend la dernière place de chaque page. */
+/** Une page de pochettes ; une page demandée hors limites revient à la première. */
 export function paginateRooms(list: readonly Room[], requestedPage: number): RoomPage {
-  const pageCount = list.length <= CELLS_PER_PAGE ? 1 : Math.ceil(list.length / (CELLS_PER_PAGE - 1));
-  const page = requestedPage >= pageCount ? 0 : requestedPage;
-  const perPage = pageCount > 1 ? CELLS_PER_PAGE - 1 : CELLS_PER_PAGE;
-  return { shown: list.slice(page * perPage, page * perPage + perPage), page, pageCount, perPage };
-}
-
-export type GridArea = { gridRow: string; gridColumn: string };
-export type RoomGridLayout = { gridTemplateRows: string; center: GridArea; slots: GridArea[] };
-
-const GRID_SPAN = 12;
-
-function area(rowStart: number, rowEnd: number, columnStart: number, columnEnd: number): GridArea {
-  return { gridRow: `${rowStart} / ${rowEnd}`, gridColumn: `${columnStart} / ${columnEnd}` };
-}
-
-/**
- * Répartit les cases autour du détail central (grille de 12 colonnes) :
- * haut, droite, bas, gauche à tour de rôle, 4 cases max par côté,
- * puis les places sont données dans le sens horaire.
- */
-export function layoutRoomGrid(cellCount: number): RoomGridLayout {
-  const perSide = [0, 0, 0, 0];
-  for (let i = 0; i < cellCount; i++) perSide[i % 4]++;
-  const [top, right, bottom, left] = perSide;
-
-  const topRow = top ? 1 : 0;
-  const middleStart = topRow + 1;
-  const bottomRow = middleStart + GRID_SPAN;
-  const slots: GridArea[] = [];
-
-  for (let i = 0; i < top; i++) {
-    slots.push(area(topRow, topRow + 1, 1 + (i * GRID_SPAN) / top, 1 + ((i + 1) * GRID_SPAN) / top));
-  }
-  for (let i = 0; i < right; i++) {
-    slots.push(area(middleStart + (i * GRID_SPAN) / right, middleStart + ((i + 1) * GRID_SPAN) / right, 10, 13));
-  }
-  for (let i = bottom - 1; i >= 0; i--) {
-    slots.push(area(bottomRow, bottomRow + 1, 1 + (i * GRID_SPAN) / bottom, 1 + ((i + 1) * GRID_SPAN) / bottom));
-  }
-  for (let i = left - 1; i >= 0; i--) {
-    slots.push(area(middleStart + (i * GRID_SPAN) / left, middleStart + ((i + 1) * GRID_SPAN) / left, 1, 4));
-  }
-
-  return {
-    gridTemplateRows: `${top ? "minmax(170px,auto) " : ""}repeat(12,minmax(40px,auto))${bottom ? " minmax(170px,auto)" : ""}`,
-    center: area(middleStart, bottomRow, left ? 4 : 1, right ? 10 : 13),
-    slots,
-  };
+  const pageCount = Math.max(1, Math.ceil(list.length / ROOMS_PER_PAGE));
+  const page = requestedPage >= 0 && requestedPage < pageCount ? requestedPage : 0;
+  return { shown: list.slice(page * ROOMS_PER_PAGE, (page + 1) * ROOMS_PER_PAGE), page, pageCount };
 }
